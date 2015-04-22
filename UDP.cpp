@@ -10,6 +10,7 @@
 
 UDP::UDP() {
 	this->port=0;
+	started=false;
 }
 
 UDP::~UDP() {
@@ -49,14 +50,18 @@ ssize_t UDP::start_listen(string name) {
 
     this->ip=this->getLocalIP();
     this->port=ntohs(selfAddress.sin_port);
+    this->processID=this->ip+":"+this->port;
 
 	cout << name << " started a new chat, listening on "
 			<< this->ip
 			<< ":" << this->port << endl;
 	cout << "Succeeded, current users:" << endl;
 
+	started=true;
+
 	while ((n = recvfrom(s, buf, sizeof(buf), 0, (struct sockaddr *) &otherAddress, &len)) != -1) {
-		char received_buf[n];
+		cout << "received connection" << endl;
+		char received_buf[sizeof(Message)];
 		memcpy(received_buf, buf, n);
 		std::thread t(&BufferParser::parse_buffer, bufferParser, (Message*)received_buf);
 	}
@@ -67,9 +72,6 @@ ssize_t UDP::start_listen(string name) {
     return 0;
 }
 
-void UDP::test(int i){
-
-}
 
 string UDP::getLocalIP(){
 	const char* google_dns_server = "8.8.8.8";
@@ -101,3 +103,49 @@ string UDP::getLocalIP(){
 	string res(inet_ntop(AF_INET,&name.sin_addr,buf,100));
 	return res;
 }
+
+int UDP::udp_send_msg(string host_in, string port_in, Message msg_in){
+		const char* host_addr=host_in.c_str();
+		int port=atoi(port_in.c_str());
+		//const char* msg=msg_in.c_str();
+
+	//    printf("client starting");
+
+	    struct sockaddr_in server;
+	    int len = sizeof(struct sockaddr_in);
+	    struct hostent *host;
+	    int s;
+
+
+
+	    host = gethostbyname(host_addr);
+	    if (host == NULL) {
+	        perror("gethostbyname");
+	        return 1;
+	    }
+
+
+	    /* initialize socket */
+	    if ((s=socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+	        perror("socket");
+	        return 1;
+	    }
+
+	    /* initialize server addr */
+	    memset((char *) &server, 0, sizeof(struct sockaddr_in));
+	    server.sin_family = AF_INET;
+	    server.sin_port = htons(port);
+	    server.sin_addr = *((struct in_addr*) host->h_addr);
+
+	    /* send message */
+	    //if (sendto(s, msg, strlen(msg), 0, (struct sockaddr *) &server, len) == -1) {
+		if (sendto(s, &msg_in, sizeof(Message), 0, (struct sockaddr *) &server, len) == -1) {
+	        perror("sendto()");
+	        return 1;
+	    }
+
+	    close(s);
+	    return 0;
+
+}
+

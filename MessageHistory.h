@@ -25,6 +25,7 @@ public:
 	//ssize_t type;
 	//std::string processId;
 	//ssize_t messageId;
+private:
 	std::unordered_map<std::string,std::string> receivedMessage;
 };
 

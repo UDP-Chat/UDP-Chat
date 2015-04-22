@@ -12,9 +12,9 @@
 
 typedef struct {
 	ssize_t type;
-	string processId;
+	char processId[22];
 	ssize_t messageId;
-	string data;
+	char data[10240];
 } Message;
 
 typedef struct{

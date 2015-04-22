@@ -21,10 +21,10 @@ BufferParser::~BufferParser() {
 
 void BufferParser::parse_buffer(Message* message){
 	Message m;
+	memcpy(m.processId,message->processId,strlen(message->processId));
+	memcpy(m.data,message->data,strlen(message->data));
 	m.messageId=message->messageId;
-	m.processId=message->processId;
 	m.type=message->type;
-	m.data=message->data;
 
 	switch(message->type){
 	case TYPE_DATA:

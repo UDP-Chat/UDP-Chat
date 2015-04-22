@@ -24,19 +24,24 @@
 #include <ifaddrs.h>
 
 
+#include <netdb.h>
+#include <unistd.h>
 
 
 
 class UDP {
 public:
+	bool started;
 	std::string ip;
 	int port;
+	string processID;
 	UDP();
 	virtual ~UDP();
 	ssize_t start_listen(string name);
 	string getLocalIP();
 	static const ssize_t BUF_SIZE=10240;
-	void test(int i);
+
+	int udp_send_msg(string host_in, string port_in, Message msg_in);
 };
 
 #endif /* UDP_H_ */
