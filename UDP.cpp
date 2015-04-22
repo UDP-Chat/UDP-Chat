@@ -54,6 +54,8 @@ ssize_t UDP::start_listen(string name) {
 			<< this->ip
 			<< ":" << this->port << endl;
 	cout << "Succeeded, current users:" << endl;
+	cout << name << " " << this->ip << ":" << this->port << endl;
+	cout << "Waiting for others to join" << endl;
 
 	while ((n = recvfrom(s, buf, sizeof(buf), 0, (struct sockaddr *) &otherAddress, &len)) != -1) {
 		char received_buf[n];

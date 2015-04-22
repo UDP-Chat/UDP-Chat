@@ -19,6 +19,10 @@ Members::~Members() {
 	// TODO Auto-generated destructor stub
 }
 
+void Members::parseNew(Message buffer){
+
+}
+
 void Members::parseJoin(Message buffer){
 
 }
@@ -30,11 +34,23 @@ void Members::parseList(Message msg){
 
 	// copy the member list into its own memberList unordered_map
 	for(std::vector<std::string>::iterator it = member.begin();it!=member.end();++it){
-		pair<std::string,long> ele((*it),(long)t);
+		MemberInfo mi;
+		mi.name=(*it).substr((*it).find('#')+1);
+		mi.time=(long)t;
+		string ipport=(*it).substr(0,(*it).find('#'));
+		pair<std::string,MemberInfo> ele(ipport,mi);
 		memberList.insert(ele);
 	}
 
-	//
+	// send NEW message to all the members in the group
+	for(auto it=memberList.begin();it!=memberList.end();++it){
+		//TODO
+		// This is a test for receive list message
+		cout<<(*it).first<<endl;
+		cout<<(*it).second.name<<endl;
+		cout<<(*it).second.time<<endl;
+		cout<<"==========================";
+	}
 }
 
 void Members::split(const std::string &s, char delim, std::vector<std::string> &elems) {
@@ -43,5 +59,9 @@ void Members::split(const std::string &s, char delim, std::vector<std::string> &
     while (std::getline(ss, item, delim)) {
         elems.push_back(item);
     }
+
+}
+
+void Members::sendNew(){
 
 }
