@@ -20,7 +20,18 @@ UDP* udp=new UDP();
 
 void start_group(string name){
 	std::thread t(&UDP::start_listen, udp, name);
+
+	while(udp->started==false){
+		std::this_thread::sleep_for (std::chrono::milliseconds(100));
+	}
+
+	cout << name << " started a new chat, listening on "
+				<< udp->processID << endl;
+	cout << "Succeeded, current users:" << endl;
+	cout << name << " " << udp->processID << endl;
+	cout << "Waiting for others to join..." << endl;
 	t.join();
+
 }
 
 string getIP(string ip_port){
@@ -41,9 +52,10 @@ void start_as_guest(string name, string group_address){
 		std::this_thread::sleep_for (std::chrono::milliseconds(100));
 	}
 
-	cout << group_address<<endl;
-	cout << getIP(group_address)<<endl;
-	cout << getPort(group_address)<<endl;
+	cout << udp->name << " joing a new chat on " << group_address
+			<<", listening on " << udp->processID << endl;
+	//TODO print current user
+	//cout << Succeeded, current
 
 	Message msg=messageHistory->createMessage(TYPE_JOIN,udp->processID,0,name);
 

@@ -52,12 +52,7 @@ ssize_t UDP::start_listen(string name) {
     this->port=ntohs(selfAddress.sin_port);
     this->processID=this->ip+":"+to_string(this->port);
 
-	cout << name << " started a new chat, listening on "
-			<< this->ip
-			<< ":" << this->port << endl;
-	cout << "Succeeded, current users:" << endl;
-	cout << name << " " << this->ip << ":" << this->port << endl;
-	cout << "Waiting for others to join" << endl;
+
 
 	started=true;
 
@@ -66,6 +61,7 @@ ssize_t UDP::start_listen(string name) {
 		char received_buf[sizeof(Message)];
 		memcpy(received_buf, buf, n);
 		std::thread t(&BufferParser::parse_buffer, bufferParser, (Message*)received_buf);
+		t.detach();
 	}
 
 
