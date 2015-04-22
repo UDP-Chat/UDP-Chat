@@ -7,6 +7,9 @@
 
 #ifndef MESSAGE_FORMAT_H_
 #define MESSAGE_FORMAT_H_
+
+#include <vector>
+
 typedef std::pair<ssize_t, ssize_t> messagePair; // (process id, message id)
 typedef struct {
 	std::vector<messagePair>* receivedList;

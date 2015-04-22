@@ -13,11 +13,8 @@ using namespace std;
 #include "upd_listener.h"
 
 void start_group(string name){
-	cout << "Starting a new group..." << endl;
-	cout << "User name: " << name << endl;
 
-	ssize_t port=9039;
-	start(port);
+	start(name);
 }
 
 void start_as_guest(string name, string group_address){

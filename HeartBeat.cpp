@@ -8,8 +8,6 @@
 #include "HeartBeat.h"
 
 
-HeartBeat hearBeat=new HeartBeat();
-
 HeartBeat::HeartBeat() {
 	// TODO Auto-generated constructor stub
 

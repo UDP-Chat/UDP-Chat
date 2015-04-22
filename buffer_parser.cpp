@@ -32,6 +32,7 @@ void* parse_buffer(void* buffer){
 	case TYPE_LEAVE:
 		break;
 	case TYPE_HEARTBEAT:
+		//heartBeat->parseMsg()
 		break;
 	default:
 		break;
