@@ -35,7 +35,7 @@ ssize_t UDP::start_listen(string name) {
     /* bind to server port */
     memset((char *) &selfAddress, 0, sizeof(struct sockaddr_in));
     selfAddress.sin_family = AF_INET;
-    selfAddress.sin_port = 0;
+    selfAddress.sin_port = 50500;
     selfAddress.sin_addr.s_addr = htonl(INADDR_ANY);
     if (bind(s, (struct sockaddr *) &selfAddress, sizeof(selfAddress)) == -1) {
         perror("bind");
@@ -66,6 +66,7 @@ ssize_t UDP::start_listen(string name) {
 		char received_buf[sizeof(Message)];
 		memcpy(received_buf, buf, n);
 		std::thread t(&BufferParser::parse_buffer, bufferParser, (Message*)received_buf);
+		t.detach();
 	}
 
 
