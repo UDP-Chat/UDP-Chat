@@ -45,14 +45,7 @@ void start_as_guest(string name, string group_address){
 	cout << getIP(group_address)<<endl;
 	cout << getPort(group_address)<<endl;
 
-	Message msg;
-	msg.type=TYPE_JOIN;
-	msg.messageId=0;
-	string pid=udp->processID;
-	memcpy(msg.processId,pid.c_str(),pid.length()+1);
-//	msg.processId=udp->ip+":"+to_string(udp->port);
-//	msg.data=name;
-	memcpy(msg.data,name.c_str(),name.length()+1);
+	Message msg=messageHistory->createMessage(TYPE_JOIN,udp->processID,0,name);
 
 	udp->udp_send_msg(getIP(group_address),getPort(group_address),msg);
 

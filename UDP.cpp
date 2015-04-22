@@ -50,7 +50,7 @@ ssize_t UDP::start_listen(string name) {
 
     this->ip=this->getLocalIP();
     this->port=ntohs(selfAddress.sin_port);
-    this->processID=this->ip+":"+this->port;
+    this->processID=this->ip+":"+to_string(this->port);
 
 	cout << name << " started a new chat, listening on "
 			<< this->ip

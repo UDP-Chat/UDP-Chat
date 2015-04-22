@@ -16,3 +16,12 @@ MessageHistory::~MessageHistory() {
 	// TODO Auto-generated destructor stub
 }
 
+
+Message MessageHistory::createMessage(ssize_t type, string processID, ssize_t messageID, string data){
+	Message msg;
+	msg.type=type;
+	msg.messageId=messageID;
+	memcpy(msg.processId,processID.c_str(),processID.length()+1);
+	memcpy(msg.data,data.c_str(),data.length()+1);
+	return msg;
+}
