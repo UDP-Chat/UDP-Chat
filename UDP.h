@@ -34,6 +34,7 @@ public:
 	bool started;
 	std::string ip;
 	int port;
+	std::string name;
 	string processID;
 	UDP();
 	virtual ~UDP();

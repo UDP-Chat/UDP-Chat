@@ -63,14 +63,14 @@ int main(int argc, char* argv[]){
 	switch(argc){
 	case 2:
 		name=argv[1];
-
+		udp->name = name;
 		start_group(name);
 
 		break;
 	case 3:
 		name=argv[1];
 		group_address=argv[2];
-
+		udp->name = name;
 		start_as_guest(name, group_address);
 
 		break;

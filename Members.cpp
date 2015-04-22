@@ -24,19 +24,25 @@ void Members::parseNew(Message buffer){
 }
 
 void Members::parseJoin(Message buffer){
-//	// After received a Join message, should return a List message
-//	Message msg;
-//	string processid(udp->ip+":"+udp->port);
-//	msg.type = TYPE_LIST;
-//	//memcpy(msg.processId,processid.c_str(),processid.length()+1);
-//	for(auto it=memberList.begin();it!=memberList.end();++it){
-//			//TODO
-//			// This is a test for receive list message
-//			cout<<(*it).first<<endl;
-//			cout<<(*it).second.name<<endl;
-//			cout<<(*it).second.time<<endl;
-//			cout<<"==========================";
-//		}
+	// After received a Join message, should return a List message
+	Message msg;
+	string processid(udp->processID);
+	string data,sendToIP,sendToPort;
+	msg.type = TYPE_LIST;
+	memcpy(msg.processId,processid.c_str(),processid.length()+1);
+
+	// add itself into the list
+	data = processid + "#" + udp->name;
+	// add other members into the list
+	for(auto it=memberList.begin();it!=memberList.end();++it){
+		data = data + " " + (*it).first+"#"+(*it).second.name;
+	}
+	memcpy(msg.data,data.c_str(),sizeof(data)+1);
+	string s(buffer.processId);
+	sendToIP = s.substr(0,s.find(":"));
+	sendToPort = s.substr(s.find(":")+1);
+
+	udp->udp_send_msg(sendToIP,sendToPort,msg);
 }
 
 void Members::parseList(Message msg){
