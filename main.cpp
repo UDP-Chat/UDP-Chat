@@ -15,6 +15,7 @@ HeartBeat* heartBeat=new HeartBeat();
 HoldbackQueue* holdbackQueue=new HoldbackQueue();
 Members* members=new Members();
 BufferParser* bufferParser=new BufferParser();
+MessageHistory* messageHistory=new MessageHistory();
 UDP* udp=new UDP();
 
 void start_group(string name){

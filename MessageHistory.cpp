@@ -9,7 +9,7 @@
 
 MessageHistory::MessageHistory() {
 	// TODO Auto-generated constructor stub
-
+	maxMessageId = 0;
 }
 
 MessageHistory::~MessageHistory() {

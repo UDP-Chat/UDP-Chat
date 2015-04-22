@@ -47,12 +47,6 @@ ssize_t UDP::start_listen(string name) {
         return 0;
     }
 
-//  Bob started a new chat, listening on 192.168.5.2:7432 Succeeded, current users:
-//	Bob 192.168.5.2.7432 (Leader)
-//	Waiting for others to join...
-	//getsockname(s, (struct sockaddr *) &self, &len);
-
-
     this->ip=this->getLocalIP();
     this->port=ntohs(selfAddress.sin_port);
 
@@ -64,7 +58,7 @@ ssize_t UDP::start_listen(string name) {
 	while ((n = recvfrom(s, buf, sizeof(buf), 0, (struct sockaddr *) &otherAddress, &len)) != -1) {
 		char received_buf[n];
 		memcpy(received_buf, buf, n);
-		std::thread t(&BufferParser::parse_buffer, bufferParser, (char*)received_buf);
+		std::thread t(&BufferParser::parse_buffer, bufferParser, (Message)received_buf);
 	}
 
 
