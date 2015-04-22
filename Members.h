@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include "message_format.h"
 
 using namespace std;
 
@@ -22,11 +23,13 @@ public:
 
 	// key is the process id defined as "ip:port" string
 	// value is the last contact time
-	std::unordered_map<std::string,long> memberList;
+	std::unordered_map<std::string,MemberInfo> memberList;
 
 	void parseJoin(Message msg);
 	void parseList(Message msg);
+	void parseNew(Message msg);
 
+	void sendNew();
 	void split(const std::string &s, char delim, std::vector<std::string> &elems);
 };
 

@@ -19,8 +19,24 @@ Members::~Members() {
 	// TODO Auto-generated destructor stub
 }
 
-void Members::parseJoin(Message buffer){
+void Members::parseNew(Message buffer){
 
+}
+
+void Members::parseJoin(Message buffer){
+	// After received a Join message, should return a List message
+	Message msg;
+	string processid(udp->ip+":"+udp->port);
+	msg.type = TYPE_LIST;
+	//memcpy(msg.processId,processid.c_str(),processid.length()+1);
+	for(auto it=memberList.begin();it!=memberList.end();++it){
+			//TODO
+			// This is a test for receive list message
+			cout<<(*it).first<<endl;
+			cout<<(*it).second.name<<endl;
+			cout<<(*it).second.time<<endl;
+			cout<<"==========================";
+		}
 }
 
 void Members::parseList(Message msg){
@@ -30,11 +46,23 @@ void Members::parseList(Message msg){
 
 	// copy the member list into its own memberList unordered_map
 	for(std::vector<std::string>::iterator it = member.begin();it!=member.end();++it){
-		pair<std::string,long> ele((*it),(long)t);
+		MemberInfo mi;
+		mi.name=(*it).substr((*it).find('#')+1);
+		mi.time=(long)t;
+		string ipport=(*it).substr(0,(*it).find('#'));
+		pair<std::string,MemberInfo> ele(ipport,mi);
 		memberList.insert(ele);
 	}
 
-	//
+	// send NEW message to all the members in the group
+	for(auto it=memberList.begin();it!=memberList.end();++it){
+		//TODO
+		// This is a test for receive list message
+		cout<<(*it).first<<endl;
+		cout<<(*it).second.name<<endl;
+		cout<<(*it).second.time<<endl;
+		cout<<"==========================";
+	}
 }
 
 void Members::split(const std::string &s, char delim, std::vector<std::string> &elems) {
@@ -43,5 +71,9 @@ void Members::split(const std::string &s, char delim, std::vector<std::string> &
     while (std::getline(ss, item, delim)) {
         elems.push_back(item);
     }
+
+}
+
+void Members::sendNew(){
 
 }

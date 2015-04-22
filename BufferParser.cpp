@@ -39,6 +39,7 @@ void BufferParser::parse_buffer(Message* message){
 		members->parseJoin(m);
 		break;
 	case TYPE_NEW:
+		members->parseNew(m);
 		break;
 	case TYPE_LIST:
 		members->parseList(m);
@@ -48,7 +49,6 @@ void BufferParser::parse_buffer(Message* message){
 	case TYPE_LEAVE:
 		break;
 	case TYPE_HEARTBEAT:
-
 		heartBeat->parseMessage(m);
 		break;
 	default:

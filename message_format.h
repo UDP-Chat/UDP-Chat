@@ -23,4 +23,9 @@ typedef struct{
 	ssize_t Seq;
 } HoldBackQueueItem;
 
+typedef struct{
+	long time;
+	string name;
+} MemberInfo;
+
 #endif /* MESSAGE_FORMAT_H_ */
