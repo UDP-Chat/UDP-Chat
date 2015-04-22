@@ -48,7 +48,8 @@ void Members::parseJoin(Message buffer){
 
 void Members::parseList(Message msg){
 	std::vector<std::string> member;
-	split(msg.data,' ',member);
+	string dataString(msg.data);
+	split(dataString,' ',member);
 	time_t t = time(0);
 
 	// copy the member list into its own memberList unordered_map
