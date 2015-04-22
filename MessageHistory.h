@@ -24,6 +24,7 @@ public:
 	std::unordered_map<ssize_t, std::string> receivedAck;
 	// received pseq, this member's message id as key, received PSEQ as value
 	std::unordered_map<ssize_t, PSEQ> receivedPseq;
+
 };
 
 #endif /* MESSAGEHISTORY_H_ */

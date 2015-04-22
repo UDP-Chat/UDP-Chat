@@ -1,21 +1,17 @@
 /*
- * buffer_parser.h
+ * BufferParser.h
  *
- *  Created on: Apr 20, 2015
+ *  Created on: Apr 22, 2015
  *      Author: yuexi
  */
 
-#ifndef BUFFER_PARSER_H_
-#define BUFFER_PARSER_H_
+#ifndef BUFFERPARSER_H_
+#define BUFFERPARSER_H_
 
 #include "includeAll.h"
-#include <iostream>
-using namespace std;
-
-#include <arpa/inet.h>
 
 
-
+class BufferParser {
 
 #define TYPE_DATA 1
 #define TYPE_PSEQ 2
@@ -29,7 +25,10 @@ using namespace std;
 #define TYPE_LEAVE 10
 #define TYPE_HEARTBEAT 11
 
-void* parse_buffer(void* buffer);
+public:
+	BufferParser();
+	virtual ~BufferParser();
+	void parse_buffer(char* buffer);
+};
 
-
-#endif /* BUFFER_PARSER_H_ */
+#endif /* BUFFERPARSER_H_ */

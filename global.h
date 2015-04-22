@@ -13,6 +13,9 @@
 extern HeartBeat* heartBeat;
 extern HoldbackQueue* holdbackQueue;
 extern Members* members;
+extern BufferParser* bufferParser;
+extern UDP* udp;
+
 
 
 #endif /* GLOBAL_H_ */
