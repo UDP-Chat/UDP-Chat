@@ -18,11 +18,13 @@ BufferParser::~BufferParser() {
 }
 
 
-void BufferParser::parse_buffer(char* buffer){
-	ssize_t* type = (ssize_t*) buffer;
-	*type = ntohl(*type);
+void BufferParser::parse_buffer(Message buffer){
+	ssize_t type = buffer.type;
+	string processId = buffer.processId;
+	ssize_t messageId = buffer.messageId;
+	string data(buffer.data);
 
-	switch(*type){
+	switch(type){
 	case TYPE_DATA:
 		break;
 	case TYPE_PSEQ:

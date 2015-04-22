@@ -11,7 +11,7 @@
 #include "includeAll.h"
 #include <unordered_map>
 #include "message_format.h"
-#include <string.h>
+#include <string>
 
 class MessageHistory {
 public:
@@ -20,11 +20,12 @@ public:
 
 	// max number that has sent
 	ssize_t maxMessageId;
-	// received ack, this member's message id as key, ACK sender's process id as value
-	std::unordered_map<ssize_t, std::string> receivedAck;
-	// received pseq, this member's message id as key, received PSEQ as value
-	std::unordered_map<ssize_t, PSEQ> receivedPseq;
 
+	//key has the following structure, linked with #
+	//ssize_t type;
+	//std::string processId;
+	//ssize_t messageId;
+	std::unordered_map<std::string,std::string> receivedMessage;
 };
 
 #endif /* MESSAGEHISTORY_H_ */

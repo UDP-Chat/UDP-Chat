@@ -9,12 +9,15 @@
 #define HOLDBACKQUEUE_H_
 
 #include "includeAll.h"
-
+#include "message_format.h"
+#include <vector>
 
 class HoldbackQueue {
 public:
 	HoldbackQueue();
 	virtual ~HoldbackQueue();
+
+	std::vector<HoldBackQueueItem> queue;
 };
 
 #endif /* HOLDBACKQUEUE_H_ */
