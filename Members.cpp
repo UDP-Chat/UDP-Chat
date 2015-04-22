@@ -27,18 +27,20 @@ void Members::parseNew(Message buffer){
 void Members::parseJoin(Message buffer){
 	// After received a Join message, should return a List message
 	Message msg;
-	string processid(udp->processID);
+
 	string data,sendToIP,sendToPort;
 	msg.type = TYPE_LIST;
-	memcpy(msg.processId,processid.c_str(),processid.length()+1);
+	memcpy(msg.processId,udp->processID.c_str(),udp->processID.length()+1);
 
 	// add itself into the list
-	data = processid + "#" + udp->name;
+	data = udp->processID + "#" + udp->name;
+	cout << data << endl;
 	// add other members into the list
 	for(auto it=memberList.begin();it!=memberList.end();++it){
 		data = data + " " + (*it).first+"#"+(*it).second.name;
 	}
-	memcpy(msg.data,data.c_str(),sizeof(data)+1);
+	memcpy(msg.data,data.c_str(),data.length()+1);
+
 	string s(buffer.processId);
 	sendToIP = s.substr(0,s.find(":"));
 	sendToPort = s.substr(s.find(":")+1);
