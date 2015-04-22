@@ -9,12 +9,13 @@
 #define MEMBER_H_
 
 #include "includeAll.h"
-
+#include <vector>
 
 class Member {
 public:
 	Member();
 	virtual ~Member();
+
 
 };
 

@@ -19,7 +19,6 @@ Members* members=new Members();
 
 
 void start_group(string name){
-
 	start(name);
 }
 
