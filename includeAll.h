@@ -26,12 +26,12 @@
 
 using namespace std;
 
+#include "message_format.h"
 #include "HeartBeat.h"
 #include "HoldbackQueue.h"
 #include "Members.h"
 #include "MessageHistory.h"
 #include "UDP.h"
-#include "message_format.h"
 #include "BufferParser.h"
 
 

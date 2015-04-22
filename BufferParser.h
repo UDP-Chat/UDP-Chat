@@ -18,7 +18,7 @@ class BufferParser {
 public:
 	BufferParser();
 	virtual ~BufferParser();
-	void parse_buffer(Message buffer);
+	void parse_buffer(Message* buffer);
 };
 
 #endif /* BUFFERPARSER_H_ */

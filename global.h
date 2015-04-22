@@ -15,7 +15,7 @@ extern HoldbackQueue* holdbackQueue;
 extern Members* members;
 extern BufferParser* bufferParser;
 extern UDP* udp;
-extern MessageHistory* messageHistory
+extern MessageHistory* messageHistory;
 
 
 #endif /* GLOBAL_H_ */

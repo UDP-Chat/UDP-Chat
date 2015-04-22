@@ -29,7 +29,7 @@
 
 class UDP {
 public:
-	string ip;
+	std::string ip;
 	int port;
 	UDP();
 	virtual ~UDP();
