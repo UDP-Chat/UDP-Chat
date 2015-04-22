@@ -18,7 +18,7 @@ HeartBeat::~HeartBeat() {
 }
 
 
-void HeartBeat::parseMessage(Message buffer) {
+void HeartBeat::parseMessage(Message message) {
 	// TODO Auto-generated constructor stub
 
 }

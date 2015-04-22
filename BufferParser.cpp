@@ -18,10 +18,15 @@ BufferParser::~BufferParser() {
 }
 
 
-void BufferParser::parse_buffer(Message* buffer){
-	ssize_t type = buffer->type;
 
-	switch(type){
+void BufferParser::parse_buffer(Message* message){
+	Message m;
+	m.messageId=message->messageId;
+	m.processId=message->processId;
+	m.type=message->type;
+	m.data=message->data;
+
+	switch(message->type){
 	case TYPE_DATA:
 		break;
 	case TYPE_PSEQ:
@@ -31,19 +36,20 @@ void BufferParser::parse_buffer(Message* buffer){
 	case TYPE_ACK:
 		break;
 	case TYPE_JOIN:
-		members->parseJoin(buffer);
+		members->parseJoin(m);
 		break;
 	case TYPE_NEW:
 		break;
 	case TYPE_LIST:
-		members->parseList(buffer);
+		members->parseList(m);
 		break;
 	case TYPE_DIE:
 		break;
 	case TYPE_LEAVE:
 		break;
 	case TYPE_HEARTBEAT:
-		//heartBeat->parseMessage(buffer);
+
+		heartBeat->parseMessage(m);
 		break;
 	default:
 		break;
