@@ -6,6 +6,7 @@
  */
 
 #include "Members.h"
+#include "global.h"
 #include <sstream>
 #include <ctime>
 #include <unordered_map>

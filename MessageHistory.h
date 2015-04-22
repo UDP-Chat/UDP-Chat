@@ -33,7 +33,7 @@ private:
 	std::unordered_map<std::string,std::string> receivedMessage;
 
 	ssize_t maxPSEQ;
-	ssize_t maxASEQ
+	ssize_t maxASEQ;
 };
 
 #endif /* MESSAGEHISTORY_H_ */
