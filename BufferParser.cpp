@@ -1,15 +1,24 @@
 /*
- * buffer_parser.cpp
+ * BufferParser.cpp
  *
- *  Created on: Apr 20, 2015
+ *  Created on: Apr 22, 2015
  *      Author: yuexi
  */
 
+#include "BufferParser.h"
+#include "global.h"
 
-#include "buffer_parser.h"
+BufferParser::BufferParser() {
+	// TODO Auto-generated constructor stub
+
+}
+
+BufferParser::~BufferParser() {
+	// TODO Auto-generated destructor stub
+}
 
 
-void* parse_buffer(void* buffer){
+void BufferParser::parse_buffer(char* buffer){
 	ssize_t* type = (ssize_t*) buffer;
 	*type = ntohl(*type);
 
@@ -23,7 +32,7 @@ void* parse_buffer(void* buffer){
 	case TYPE_ACK:
 		break;
 	case TYPE_JOIN:
-//		members.parseJoin(buffer);
+		members->parseJoin(buffer);
 		break;
 	case TYPE_NEW:
 		break;
@@ -34,11 +43,9 @@ void* parse_buffer(void* buffer){
 	case TYPE_LEAVE:
 		break;
 	case TYPE_HEARTBEAT:
-//		heartBeat.parseMessage(buffer);
+		heartBeat->parseMessage(buffer);
 		break;
 	default:
 		break;
 	}
-
-	return (void*)type;
 }

@@ -14,13 +14,11 @@ using namespace std;
 HeartBeat* heartBeat=new HeartBeat();
 HoldbackQueue* holdbackQueue=new HoldbackQueue();
 Members* members=new Members();
-
-#include "upd_listener.h"
-
+BufferParser* bufferParser=new BufferParser();
+UDP* udp=new UDP();
 
 void start_group(string name){
-
-	start(name);
+	udp->start_listen(name);
 }
 
 void start_as_guest(string name, string group_address){
