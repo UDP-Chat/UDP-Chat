@@ -15,6 +15,7 @@
 #include "Members.h"
 #include "MessageHistory.h"
 #include "upd_listener.h"
+#include "message_format.h"
 
 
 
