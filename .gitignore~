@@ -1,6 +1,6 @@
-./Debug
+/Debug
 .cproject
-./Release/
-.settings
+/Release
+/.settings
 .project
-
+.gitignore~
