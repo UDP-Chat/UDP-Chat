@@ -58,7 +58,7 @@ ssize_t UDP::start_listen(string name) {
 	while ((n = recvfrom(s, buf, sizeof(buf), 0, (struct sockaddr *) &otherAddress, &len)) != -1) {
 		char received_buf[n];
 		memcpy(received_buf, buf, n);
-		std::thread t(&BufferParser::parse_buffer, bufferParser, (Message)received_buf);
+		std::thread t(&BufferParser::parse_buffer, bufferParser, (Message*)received_buf);
 	}
 
 

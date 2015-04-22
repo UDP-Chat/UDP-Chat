@@ -18,8 +18,8 @@ BufferParser::~BufferParser() {
 }
 
 
-void BufferParser::parse_buffer(Message buffer){
-	ssize_t type = buffer.type;
+void BufferParser::parse_buffer(Message* buffer){
+	ssize_t type = buffer->type;
 
 	switch(type){
 	case TYPE_DATA:
@@ -36,13 +36,14 @@ void BufferParser::parse_buffer(Message buffer){
 	case TYPE_NEW:
 		break;
 	case TYPE_LIST:
+		members->parseList(buffer);
 		break;
 	case TYPE_DIE:
 		break;
 	case TYPE_LEAVE:
 		break;
 	case TYPE_HEARTBEAT:
-		heartBeat->parseMessage(buffer);
+		//heartBeat->parseMessage(buffer);
 		break;
 	default:
 		break;

@@ -11,6 +11,7 @@
 #include "includeAll.h"
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -25,6 +26,8 @@ public:
 
 	void parseJoin(Message msg);
 	void parseList(Message msg);
+
+	void split(const std::string &s, char delim, std::vector<std::string> &elems);
 };
 
 #endif /* MEMBERS_H_ */

@@ -9,6 +9,7 @@
 #define HEARTBEAT_H_
 
 #include "includeAll.h"
+#include "message_format.h"
 
 class HeartBeat {
 public:
