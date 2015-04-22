@@ -7,7 +7,6 @@ CPP_SRCS += \
 ../BufferParser.cpp \
 ../HeartBeat.cpp \
 ../HoldbackQueue.cpp \
-../Member.cpp \
 ../Members.cpp \
 ../MessageHistory.cpp \
 ../UDP.cpp \
@@ -17,7 +16,6 @@ OBJS += \
 ./BufferParser.o \
 ./HeartBeat.o \
 ./HoldbackQueue.o \
-./Member.o \
 ./Members.o \
 ./MessageHistory.o \
 ./UDP.o \
@@ -27,7 +25,6 @@ CPP_DEPS += \
 ./BufferParser.d \
 ./HeartBeat.d \
 ./HoldbackQueue.d \
-./Member.d \
 ./Members.d \
 ./MessageHistory.d \
 ./UDP.d \
