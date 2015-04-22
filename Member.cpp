@@ -1,22 +1,19 @@
 /*
- * Members.cpp
+ * Member.cpp
  *
  *  Created on: Apr 22, 2015
  *      Author: yuexi
  */
 
-#include "Members.h"
+#include "Member.h"
+#include "global.h"
 
-
-Members::Members() {
+Member::Member() {
 	// TODO Auto-generated constructor stub
 
 }
 
-Members::~Members() {
+Member::~Member() {
 	// TODO Auto-generated destructor stub
 }
 
-void Members::parseJoin(void* buffer){
-
-}

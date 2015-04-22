@@ -8,6 +8,7 @@
 
 #include "buffer_parser.h"
 
+
 void* parse_buffer(void* buffer){
 	ssize_t* type = (ssize_t*) buffer;
 	*type = ntohl(*type);
@@ -22,6 +23,7 @@ void* parse_buffer(void* buffer){
 	case TYPE_ACK:
 		break;
 	case TYPE_JOIN:
+//		members.parseJoin(buffer);
 		break;
 	case TYPE_NEW:
 		break;
@@ -32,7 +34,7 @@ void* parse_buffer(void* buffer){
 	case TYPE_LEAVE:
 		break;
 	case TYPE_HEARTBEAT:
-		//heartBeat->parseMsg()
+//		heartBeat.parseMessage(buffer);
 		break;
 	default:
 		break;

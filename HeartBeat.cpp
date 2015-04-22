@@ -17,3 +17,8 @@ HeartBeat::~HeartBeat() {
 	// TODO Auto-generated destructor stub
 }
 
+
+void HeartBeat::parseMessage(void* buffer) {
+	// TODO Auto-generated constructor stub
+
+}

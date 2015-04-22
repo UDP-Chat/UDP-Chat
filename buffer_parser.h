@@ -8,6 +8,7 @@
 #ifndef BUFFER_PARSER_H_
 #define BUFFER_PARSER_H_
 
+#include "includeAll.h"
 #include <iostream>
 using namespace std;
 

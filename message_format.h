@@ -5,6 +5,7 @@
  *      Author: cis455
  */
 
+
 #ifndef MESSAGE_FORMAT_H_
 #define MESSAGE_FORMAT_H_
 
@@ -15,6 +16,7 @@ typedef struct {
 	std::vector<messagePair>* receivedList;
 	long time;
 } ReceivedAndTime;
+
 typedef struct {
 	ssize_t processId;
 	ssize_t messageId;
@@ -22,6 +24,7 @@ typedef struct {
 	ssize_t marker;
 	char data[10240];
 } Message;
+
 typedef struct {
 	ssize_t type;
 	ssize_t processId; // process id

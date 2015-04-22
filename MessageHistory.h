@@ -8,6 +8,9 @@
 #ifndef MESSAGEHISTORY_H_
 #define MESSAGEHISTORY_H_
 
+#include "includeAll.h"
+
+
 class MessageHistory {
 public:
 	MessageHistory();
