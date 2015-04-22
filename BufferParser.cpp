@@ -20,9 +20,6 @@ BufferParser::~BufferParser() {
 
 void BufferParser::parse_buffer(Message buffer){
 	ssize_t type = buffer.type;
-	string processId = buffer.processId;
-	ssize_t messageId = buffer.messageId;
-	string data(buffer.data);
 
 	switch(type){
 	case TYPE_DATA:

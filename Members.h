@@ -23,7 +23,8 @@ public:
 	// value is the last contact time
 	std::unordered_map<std::string,long> memberList;
 
-	void parseJoin(void* buffer);
+	void parseJoin(Message msg);
+	void parseList(Message msg);
 };
 
 #endif /* MEMBERS_H_ */

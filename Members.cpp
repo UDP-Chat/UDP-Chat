@@ -17,6 +17,10 @@ Members::~Members() {
 	// TODO Auto-generated destructor stub
 }
 
-void Members::parseJoin(void* buffer){
+void Members::parseJoin(Message buffer){
 
+}
+
+void Members::parseList(Message buffer){
+	buffer.data;
 }
