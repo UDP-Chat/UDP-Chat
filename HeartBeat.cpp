@@ -8,7 +8,6 @@
 #include "HeartBeat.h"
 
 
-HeartBeat hearBeat=new HeartBeat();
 
 HeartBeat::HeartBeat() {
 	// TODO Auto-generated constructor stub
@@ -19,3 +18,8 @@ HeartBeat::~HeartBeat() {
 	// TODO Auto-generated destructor stub
 }
 
+
+void HeartBeat::parseMessage(void* buffer) {
+	// TODO Auto-generated constructor stub
+
+}

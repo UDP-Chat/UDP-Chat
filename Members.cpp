@@ -16,3 +16,7 @@ Members::~Members() {
 	// TODO Auto-generated destructor stub
 }
 
+
+void Members::parseJoin(void* buffer){
+
+}

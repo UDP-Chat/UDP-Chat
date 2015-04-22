@@ -9,8 +9,14 @@
 using namespace std;
 
 #include <sstream>
+#include "includeAll.h"`````````````````````````````````````````````````````````````````````````````````````````````````````````
+
+HeartBeat heartBeat=new HeartBeat();
+HoldbackQueue holdbackQueue=new HoldbackQueue();
+Members members=new Members();
 
 #include "upd_listener.h"
+
 
 void start_group(string name){
 	cout << "Starting a new group..." << endl;

@@ -8,10 +8,14 @@
 #ifndef MEMBERS_H_
 #define MEMBERS_H_
 
+#include "includeAll.h"
+#include "global.h"
+
 class Members {
 public:
 	Members();
 	virtual ~Members();
+	void parseJoin(void* buffer);
 };
 
 #endif /* MEMBERS_H_ */
