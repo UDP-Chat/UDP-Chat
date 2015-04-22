@@ -22,6 +22,8 @@
 
 #include <thread>
 #include <iostream>
+#include <semaphore.h>
+
 using namespace std;
 
 #include "HeartBeat.h"

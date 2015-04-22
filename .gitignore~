@@ -1,5 +1,14 @@
-/Debug/
+./Debug/
+<<<<<<< HEAD
 .cproject
-/Release/
+./Release/
 .settings
 .project
+=======
+./Release/
+.cproject
+.settings
+.project
+
+>>>>>>> e1f3933e3fa1238ec9340affc9c71d23a31d8a5a
+/Debug/
