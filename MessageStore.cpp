@@ -299,3 +299,5 @@ string MessageStore::to_string(Message2 m2){
 	return m2.processId + " type: "+type+" mid: "+std::to_string(m2.messageId)+" content: "+m2.data;
 }
 
+
+

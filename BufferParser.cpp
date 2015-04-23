@@ -21,9 +21,9 @@ BufferParser::~BufferParser() {
 
 void BufferParser::parse_buffer(Message* message){
 	Message m=messageStore->createMessage(message);
-	heartBeat->parseMessage(m);
-
 	Message2 m2=messageStore->convert_message_to_cpp(m);
+
+	heartBeat->parseMessage(m2);
 
 //	cout << "   received message from "+messageStore->to_string(m2)<< endl;
 
@@ -55,6 +55,10 @@ void BufferParser::parse_buffer(Message* message){
 	case TYPE_LEAVE:
 		break;
 	case TYPE_HEARTBEAT://finished.
+		break;
+	case TYPE_CHECKALIVE://finished.
+		break;
+	case TYPE_COMFIRMALIVE://finished.
 		break;
 	default:
 		break;

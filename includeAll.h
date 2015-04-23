@@ -19,13 +19,20 @@
 #define TYPE_LASTTIME 9
 #define TYPE_LEAVE 10
 #define TYPE_HEARTBEAT 11
+#define TYPE_CHECKALIVE 12
+#define TYPE_COMFIRMALIVE 13
+
 
 #define MESSAGE_ID_JOIN -3
 #define MESSAGE_ID_LIST -2
 #define MESSAGE_ID_NEW -1
+#define MESSAGE_ID_HEARTBEAT -5
+#define MESSAGE_ID_CHECKALIVE -6
+#define MESSAGE_ID_COMFIRMALIVE -7
 
 #define MAX_TRAILS 13
 #define RESEND_INTERVAL 300
+#define HEARTBEAT_ALIVE_TIMEOUT 15
 
 #include <thread>
 #include <iostream>

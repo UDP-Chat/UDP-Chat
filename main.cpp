@@ -19,14 +19,18 @@ MessageStore* messageStore=new MessageStore();
 UDP* udp=new UDP();
 
 void inputLoop(){
+	heartBeat->startMonitor();
+
+
 	string input;
 	while(true){
 		cin >> input;
 		if(cin.eof()){
 			cout << "Quitting chat..." << endl;
+			//TODO
 			break;
 		}else{
-			cout << "   sending chat..."<<endl;
+//			cout << "   sending chat..."<<endl;
 			messageStore->sendDATA(input);
 
 //			if(input.find("printmembers")!=string::npos){
@@ -42,6 +46,8 @@ void start_group(){
 	while(udp->started==false){
 		std::this_thread::sleep_for (std::chrono::milliseconds(100));
 	}
+
+//	members->addMember(udp->processID,udp->name);
 
 	cout << udp->name << " started a new chat, listening on "
 				<< udp->processID << endl;

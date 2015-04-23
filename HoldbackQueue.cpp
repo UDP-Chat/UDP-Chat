@@ -45,12 +45,21 @@ void HoldbackQueue::findDeliverable(){
 					string name=msg.data;
 					string pid=msg.processId;
 
-					members->addMember(pid,name);
-					cout << "NOTICE " << name << " joined on " << pid << endl;
+					if(pid.compare(udp->processID)==0){
+
+					}else{
+						members->addMember(pid,name);
+						cout << "NOTICE " << name << " joined on " << pid << endl;
+					}
+
 				}
 				else{ // a chat message
-
-					string name = members->memberList.find(msg.processId)->second.name;
+					string name;
+					if(msg.processId.compare(udp->processID)==0){
+						name = udp->name;
+					}else{
+						name = members->memberList.find(msg.processId)->second.name;
+					}
 
 					string chat=msg.data;
 					cout << name << ":: " << chat << endl;

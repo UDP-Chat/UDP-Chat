@@ -55,6 +55,7 @@ public:
 	void sendACK(string processID, Message m);
 	void sendDATA(string content);
 	string to_string(Message2 m2);
+	void sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString);
 
 private:
 	//key has the following structure, linked with #
@@ -63,7 +64,6 @@ private:
 	//ssize_t messageId;
 	std::unordered_map<std::string,std::string> receivedMessages;
 	string getKey(ssize_t type, string pid, ssize_t mid);
-	void sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString);
 	void sendFourway(ssize_t type, ssize_t messageID, string data, string printString);
 };
 
