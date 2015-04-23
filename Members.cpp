@@ -21,6 +21,12 @@ Members::~Members() {
 }
 
 void Members::parseNew(Message buffer){
+	// put into hold back queue
+	HoldBackQueueItem item;
+	int pseq = max(messageHistory->get_maxPSEQ(),messageHistory->get_maxASEQ())+1;
+	item.Seq = pseq;
+	item.deliverable = false;
+	item.m = buffer;
 
 }
 
@@ -31,6 +37,7 @@ void Members::parseJoin(Message buffer){
 	string data,sendToIP,sendToPort;
 	msg.type = TYPE_LIST;
 	memcpy(msg.processId,udp->processID.c_str(),udp->processID.length()+1);
+	msg.messageId=0;
 
 	// add itself into the list
 	data = udp->processID + "#" + udp->name;
@@ -68,10 +75,7 @@ void Members::parseList(Message msg){
 	for(auto it=memberList.begin();it!=memberList.end();++it){
 		//TODO
 		// This is a test for receive list message
-		cout<<(*it).first<<endl;
-		cout<<(*it).second.name<<endl;
-		cout<<(*it).second.time<<endl;
-		cout<<"==========================";
+		std::thread t(&Members::sendNew, members, (*it).first);
 	}
 }
 
@@ -84,6 +88,23 @@ void Members::split(const std::string &s, char delim, std::vector<std::string> &
 
 }
 
-void Members::sendNew(){
+void Members::sendNew(string processId){
+	Message msg;
+	msg.type=TYPE_NEW;
+	msg.messageId=0;
+	memcpy(msg.processId,udp->processID.c_str(),udp->processID.length()+1);
+	memcpy(msg.data,udp->name.c_str(),udp->name.length()+1);
+	string s(processId);
+	string sendToIP = s.substr(0,s.find(":"));
+	string sendToPort = s.substr(s.find(":")+1);
+	udp->udp_send_msg(sendToIP,sendToPort,msg);
+}
 
+void Members::addMember(string processid, string name){
+	MemberInfo mi;
+	time_t t = time(0);
+	mi.name = name;
+	mi.time = (long)t;
+	pair<std::string,MemberInfo> newPair(processid,mi);
+	this->memberList.insert(newPair);
 }

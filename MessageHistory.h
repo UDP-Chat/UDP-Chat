@@ -28,6 +28,8 @@ public:
 
 	Message createMessage(ssize_t type, string processID, ssize_t messageID, string data);
 
+	ssize_t get_maxPSEQ();
+	ssize_t get_maxASEQ();
 
 private:
 	std::unordered_map<std::string,std::string> receivedMessage;

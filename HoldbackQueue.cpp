@@ -6,6 +6,12 @@
  */
 
 #include "HoldbackQueue.h"
+#include <algorithm>
+#include "global.h"
+
+bool HoldbackQueue::compareSeq(const HoldBackQueueItem& item1,const HoldBackQueueItem& item2){
+	return item1.Seq < item2.Seq;
+}
 
 HoldbackQueue::HoldbackQueue() {
 	// TODO Auto-generated constructor stub
@@ -16,3 +22,27 @@ HoldbackQueue::~HoldbackQueue() {
 	// TODO Auto-generated destructor stub
 }
 
+void HoldbackQueue::put(HoldBackQueueItem item){
+	this->queue.push_back(item);
+	// sort the queue to find any deliverable messages
+	std::sort(queue.begin(),queue.end(),HoldbackQueue::compareSeq);
+
+	// find deliverable messages
+	for(int i=0;i<queue.size();i++){
+		if(queue[i].deliverable){
+			Message msg = queue[i].m;
+			if(queue[i].m.type==TYPE_NEW){ // add a new member
+				string pid(msg.processId);
+				string name(msg.data);
+				members->addMember(pid,name);
+			}
+			else{ // a chat message
+
+			}
+			// delete the already delivered message
+			queue.erase(queue.begin()+i);
+			i--;
+		}
+	}
+
+}

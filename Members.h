@@ -29,8 +29,9 @@ public:
 	void parseList(Message msg);
 	void parseNew(Message msg);
 
-	void sendNew();
+	void sendNew(string processid);
 	void split(const std::string &s, char delim, std::vector<std::string> &elems);
+	void addMember(string processid, string name);
 };
 
 #endif /* MEMBERS_H_ */
