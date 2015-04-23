@@ -22,10 +22,10 @@ void HeartBeat::parseMessage(Message2 message) {
 	if(members->memberList.count(message.processId)>0){
 		members->memberList.find(message.processId)->second.time=(long)t;
 	}
-
+	Message reply;
 	switch(message.type){
 	case TYPE_CHECKALIVE:
-		Message reply=messageStore->createMessage(TYPE_COMFIRMALIVE, udp->processID, MESSAGE_ID_COMFIRMALIVE, "");
+		reply=messageStore->createMessage(TYPE_COMFIRMALIVE, udp->processID, MESSAGE_ID_COMFIRMALIVE, "");
 		udp->send_msg(message.processId,reply);
 		break;
 	case TYPE_COMFIRMALIVE:

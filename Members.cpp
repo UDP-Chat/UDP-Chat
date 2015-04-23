@@ -104,6 +104,11 @@ void Members::printMemberList(){
 
 void Members::reportDie(string pid){
 	//TODO
+	cout << pid +" is dead."<<endl;
+
+
+
+
 }
 
 
