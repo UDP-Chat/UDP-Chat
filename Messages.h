@@ -5,18 +5,18 @@
  *      Author: yuexi
  */
 
-#ifndef MESSAGEHISTORY_H_
-#define MESSAGEHISTORY_H_
+#ifndef MESSAGES_H_
+#define MESSAGES_H_
 
 #include "includeAll.h"
 #include <unordered_map>
 #include "message_format.h"
 #include <string>
 
-class MessageHistory {
+class Messages {
 public:
-	MessageHistory();
-	virtual ~MessageHistory();
+	Messages();
+	virtual ~Messages();
 
 	// max number that has sent
 	ssize_t maxMessageId;
@@ -40,12 +40,17 @@ public:
 
 	string getMessageData(ssize_t type, string processID, ssize_t messageID);
 
+	void putMessage(Message m);
+	void putMessage(Message2 m);
+
 	ssize_t maxPSEQ;
 	ssize_t maxASEQ;
+
 private:
 	std::unordered_map<std::string,std::string> receivedMessages;
+	sem_t lock;
 
 
 };
 
-#endif /* MESSAGEHISTORY_H_ */
+#endif /* MESSAGES_H_ */

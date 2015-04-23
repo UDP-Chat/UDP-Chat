@@ -15,7 +15,7 @@ HeartBeat* heartBeat=new HeartBeat();
 HoldbackQueue* holdbackQueue=new HoldbackQueue();
 Members* members=new Members();
 BufferParser* bufferParser=new BufferParser();
-MessageHistory* messageHistory=new MessageHistory();
+Messages* messageStore=new Messages();
 UDP* udp=new UDP();
 
 void start_group(string name){
@@ -47,9 +47,9 @@ void start_as_guest(string name, string group_address){
 	//TODO print current user
 	//cout << Succeeded, current
 
-	Message msg=messageHistory->createMessage(TYPE_JOIN,udp->processID,0,name);
+	Message msg=messageStore->createMessage(TYPE_JOIN,udp->processID,0,name);
 
-	udp->udp_send_msg(messageHistory->getIP(group_address),messageHistory->getPort(group_address),msg);
+	udp->udp_send_msg(messageStore->getIP(group_address),messageStore->getPort(group_address),msg);
 
 	cout << "JOIN sent" << endl;
 

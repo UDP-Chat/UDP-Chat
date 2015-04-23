@@ -30,7 +30,7 @@ using namespace std;
 #include "HeartBeat.h"
 #include "HoldbackQueue.h"
 #include "Members.h"
-#include "MessageHistory.h"
+#include "Messages.h"
 #include "UDP.h"
 #include "BufferParser.h"
 
