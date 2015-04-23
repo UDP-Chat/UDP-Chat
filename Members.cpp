@@ -72,6 +72,8 @@ void Members::parseList(Message2 msg){
 
 	messageStore->sendNEW();
 
+	cout << "JOIN success! Start chat!"<<endl;
+
 
 }
 

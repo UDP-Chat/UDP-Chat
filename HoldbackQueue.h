@@ -25,6 +25,7 @@ public:
 private:
 	static bool compareSeq(const HoldBackQueueItem&,const HoldBackQueueItem&);
 	void findDeliverable();
+	void printQueue();
 };
 
 #endif /* HOLDBACKQUEUE_H_ */

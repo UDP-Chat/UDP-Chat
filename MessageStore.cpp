@@ -44,8 +44,8 @@ Message MessageStore::createMessage(ssize_t type, string processID, ssize_t mess
 Message MessageStore::createMessage(Message* message){
 	Message m;
 
-	memcpy(m.processId,message->processId,strlen(message->processId));
-	memcpy(m.data,message->data,strlen(message->data));
+	memcpy(m.processId,message->processId,strlen(message->processId)+1);
+	memcpy(m.data,message->data,strlen(message->data)+1);
 	m.messageId=message->messageId;
 	m.type=message->type;
 	return m;
@@ -119,7 +119,7 @@ void MessageStore::putMessage(Message2 m2){
 
 
 string MessageStore::getKey(ssize_t type, string processId, ssize_t messageId){
-	return to_string(type)+"#"+processId+"#"+to_string(messageId);
+	return std::to_string(type)+"#"+processId+"#"+std::to_string(messageId);
 }
 
 
@@ -138,10 +138,10 @@ bool MessageStore::sendJOIN(string group_processId){
 	int trials=0;
 
 	while(this->existMessage(expectedReturn)==false && trials<MAX_TRAILS){
-		cout << "   sending JOIN..." << endl;
+//		cout << "   sending JOIN..." << endl;
 		udp->send_msg(group_processId,msg);
 		trials++;
-		std::this_thread::sleep_for (std::chrono::seconds(RESEND_INTERVAL));
+		std::this_thread::sleep_for (std::chrono::milliseconds(RESEND_INTERVAL));
 	}
 
 	if(this->existMessage(expectedReturn)){
@@ -163,12 +163,13 @@ void MessageStore::sendASEQ(ssize_t messageID, int aseq){
 
 	int i=0;
 
-	Message msg=this->createMessage(TYPE_ASEQ, udp->processID, MESSAGE_ID_NEW, to_string(aseq));
+
+	Message msg=this->createMessage(TYPE_ASEQ, udp->processID, messageID, std::to_string(aseq));
 
 	// send ASEQ message to all the members in the group
 	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
 		string pid=(*it).first;
-		Message expectedReply=createMessage(TYPE_ACK, pid, MESSAGE_ID_NEW,"");
+		Message expectedReply=createMessage(TYPE_ACK, pid, messageID,"");
 		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, "   sending ASEQ to "+pid+" ...");
 		i++;
 	}
@@ -176,18 +177,23 @@ void MessageStore::sendASEQ(ssize_t messageID, int aseq){
 	for(int j=0; j<i;j++){
 		threads[j].join();
 	}
+
+	//mark deliverable
+	holdbackQueue->updateAseq(convert_message_to_cpp(msg));
 }
 
 
 void MessageStore::sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString){
 	int trials=0;
 
+
 	while(this->existMessage(expectedReply)==false && trials<MAX_TRAILS){
-		cout << printString << endl;
+//		cout << printString + " Message: "+this->to_string(this->convert_message_to_cpp(message))<< endl;
 		udp->send_msg(processID,message);
 		trials++;
-		std::this_thread::sleep_for (std::chrono::seconds(RESEND_INTERVAL));
+		std::this_thread::sleep_for (std::chrono::milliseconds(RESEND_INTERVAL));
 	}
+
 
 	if(this->existMessage(expectedReply)==false){
 		members->reportDie(processID);
@@ -214,6 +220,18 @@ void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, str
 
 	Message msg=this->createMessage(type, udp->processID, messageID, data);
 
+	//put into its own queu
+	if(this->existMessage(msg)==false){
+		HoldBackQueueItem item;
+		item.Seq = this->get_maxPSEQ();
+		item.deliverable = false;
+		item.m = this->convert_message_to_cpp(msg);
+	    holdbackQueue->put(item);
+	    this->putMessage(item.m);
+	}
+
+
+
 	int i=0;
 	// send DATA message to all the members in the group
 	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
@@ -236,9 +254,48 @@ void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, str
 		if(pseq>maxPSEQ)maxPSEQ=pseq;
 	}
 
+	if(maxPSEQ > messageStore->get_maxASEQ()){
+		messageStore->set_maxASEQ(maxPSEQ);
+	}
 
 	messageStore->sendASEQ(messageID, maxPSEQ);
 }
 
 
+string MessageStore::to_string(Message2 m2){
+	string type;
+	switch(m2.type){
+	case TYPE_ACK:
+		type="ACK";
+		break;
+	case TYPE_ASEQ:
+		type="ASEQ";
+		break;
+	case TYPE_DATA:
+		type="DATA";
+		break;
+	case TYPE_DIE:
+		type="DIE";
+		break;
+	case TYPE_HEARTBEAT:
+		type="HEARTBEAT";
+		break;
+	case TYPE_JOIN:
+		type="JOIN";
+		break;
+	case TYPE_LEAVE:
+		type="LEAVE";
+		break;
+	case TYPE_NEW:
+		type="NEW";
+		break;
+	case TYPE_PSEQ:
+		type="PSEQ";
+		break;
+	default:
+		type="?";
+		break;
+	}
+	return m2.processId + " type: "+type+" mid: "+std::to_string(m2.messageId)+" content: "+m2.data;
+}
 

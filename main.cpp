@@ -18,6 +18,24 @@ BufferParser* bufferParser=new BufferParser();
 MessageStore* messageStore=new MessageStore();
 UDP* udp=new UDP();
 
+void inputLoop(){
+	string input;
+	while(true){
+		cin >> input;
+		if(cin.eof()){
+			cout << "Quitting chat..." << endl;
+			break;
+		}else{
+			cout << "   sending chat..."<<endl;
+			messageStore->sendDATA(input);
+
+//			if(input.find("printmembers")!=string::npos){
+//				members->printMemberList();
+//			}
+		}
+	}
+}
+
 void start_group(){
 	std::thread t(&UDP::start_listen, udp, udp->name);
 
@@ -31,17 +49,7 @@ void start_group(){
 	cout << udp->name << " " << udp->processID << endl;
 	cout << "Waiting for others to join..." << endl;
 
-	string input;
-	while(true){
-		cin >> input;
-		if(cin.eof()){
-			cout << "Quitting chat..." << endl;
-			break;
-		}else{
-			cout << "   sending chat..."<<endl;
-			messageStore->sendDATA(input);
-		}
-	}
+	inputLoop();
 
 	t.join();
 
@@ -60,7 +68,7 @@ void start_as_guest(string group_address){
 
 	// print out current user list
 	if(messageStore->sendJOIN(group_address)){
-		cout << "Succeeded, current users:" << endl;
+		cout << "Got list. current users:" << endl;
 		for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
 				cout << (*it).second.name << " " << (*it).first<<endl;
 		}
@@ -69,17 +77,8 @@ void start_as_guest(string group_address){
 		exit (EXIT_FAILURE);
 	}
 
-	string input;
-	while(true){
-		cin >> input;
-		if(cin.eof()){
-			cout << "Quitting chat..." << endl;
-			break;
-		}else{
-			cout << "   sending chat..."<<endl;
-			messageStore->sendDATA(input);
-		}
-	}
+
+	inputLoop();
 
 	t.join();
 }

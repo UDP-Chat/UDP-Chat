@@ -26,22 +26,32 @@ void HoldbackQueue::put(HoldBackQueueItem item){
 	this->queue.push_back(item);
 }
 
+void HoldbackQueue::printQueue(){
+//	for(int i=0;i<queue.size();i++){
+//		cout << "     Deliverable: " << queue[i].deliverable << " Seq: " << queue[i].Seq << " Type: " << queue[i].m.type << " Data: " << queue[i].m.data <<endl;
+//		cout << "           Processid: " << queue[i].m.processId << " Messageid: " << queue[i].m.messageId <<endl;
+//	}
+}
 void HoldbackQueue::findDeliverable(){
 	// sort the queue to find any deliverable messages
 	std::sort(queue.begin(),queue.end(),HoldbackQueue::compareSeq);
 
+	//printQueue();
 	// find deliverable messages
 		for(int i=0;i<queue.size();i++){
 			if(queue[i].deliverable){
 				Message2 msg = queue[i].m;
-				string name=msg.data;
 				if(queue[i].m.type==TYPE_NEW){ // add a new member
-					string pid(msg.processId);
+					string name=msg.data;
+					string pid=msg.processId;
 
 					members->addMember(pid,name);
 					cout << "NOTICE " << name << " joined on " << pid << endl;
 				}
 				else{ // a chat message
+
+					string name = members->memberList.find(msg.processId)->second.name;
+
 					string chat=msg.data;
 					cout << name << ":: " << chat << endl;
 				}
@@ -55,10 +65,13 @@ void HoldbackQueue::findDeliverable(){
 }
 
 void HoldbackQueue::updateAseq(Message2 msg){
-	for(int i;i<queue.size();i++){
+	printQueue();
+	for(int i=0; i<queue.size();i++){
 		Message2 mq = queue[i].m;
+//		cout << "Received Aseq: processId "<<msg.processId<<" messageId: "<<msg.messageId<<endl;
 
 		if(mq.processId.compare(msg.processId)==0 && mq.messageId==msg.messageId){
+//			cout << "Find the deliverable msg in holdback queue" << endl;
 			queue[i].Seq = atoi(msg.data.c_str());
 			queue[i].deliverable=true;
 			break;

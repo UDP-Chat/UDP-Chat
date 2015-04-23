@@ -25,7 +25,7 @@
 #define MESSAGE_ID_NEW -1
 
 #define MAX_TRAILS 13
-#define RESEND_INTERVAL 2
+#define RESEND_INTERVAL 300
 
 #include <thread>
 #include <iostream>

@@ -25,7 +25,7 @@ void BufferParser::parse_buffer(Message* message){
 
 	Message2 m2=messageStore->convert_message_to_cpp(m);
 
-	cout << "   received message from "+to_string(m2.messageId) + " type: "+to_string(m2.type)+" mid: "+to_string(m2.messageId)+" content: "+m2.data<< endl;
+//	cout << "   received message from "+messageStore->to_string(m2)<< endl;
 
 	switch(m.type){
 	case TYPE_DATA://finished

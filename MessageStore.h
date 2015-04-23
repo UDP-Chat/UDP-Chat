@@ -54,6 +54,7 @@ public:
 	void sendASEQ(ssize_t messageID, int maxASEQ);
 	void sendACK(string processID, Message m);
 	void sendDATA(string content);
+	string to_string(Message2 m2);
 
 private:
 	//key has the following structure, linked with #
