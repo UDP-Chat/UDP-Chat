@@ -20,7 +20,7 @@
 #define TYPE_LEAVE 10
 #define TYPE_HEARTBEAT 11
 
-#define MESSAGE_ID_JOIN 1
+#define MESSAGE_ID_JOIN -3
 #define MESSAGE_ID_LIST -2
 #define MESSAGE_ID_NEW -1
 
