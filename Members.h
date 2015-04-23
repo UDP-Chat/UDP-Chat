@@ -36,13 +36,9 @@ public:
 	void split(const std::string &s, char delim, std::vector<std::string> &elems);
 	void addMember(string processid, string name);
 
-<<<<<<< HEAD
-	void reportDie(string pid);
-	void sendLeave();
-=======
+
 	void reportNoResponse(string pid);
 	string getName(string pid);
->>>>>>> ad5f6bbe6ecb656464fe9b4eaa97e5b89342dcec
 
 	void printMemberList();
 };

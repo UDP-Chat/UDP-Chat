@@ -22,6 +22,7 @@ public:
 
 	void put(HoldBackQueueItem item);
 	void updateAseq(Message2 msg);
+	void removeMessage(string processID, ssize_t messageID);
 private:
 	static bool compareSeq(const HoldBackQueueItem&,const HoldBackQueueItem&);
 	void findDeliverable();
