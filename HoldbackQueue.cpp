@@ -60,6 +60,7 @@ void HoldbackQueue::updateAseq(Message2 msg){
 
 		if(mq.processId.compare(msg.processId)==0 && mq.messageId==msg.messageId){
 			queue[i].Seq = atoi(msg.data.c_str());
+			queue[i].deliverable=true;
 			break;
 		}
 	}
