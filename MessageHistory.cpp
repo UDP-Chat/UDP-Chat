@@ -10,12 +10,20 @@
 MessageHistory::MessageHistory() {
 	// TODO Auto-generated constructor stub
 	maxMessageId = 0;
+	maxPSEQ = 0;
+	maxASEQ = 0;
 }
 
 MessageHistory::~MessageHistory() {
 	// TODO Auto-generated destructor stub
 }
 
+ssize_t MessageHistory::get_maxPSEQ(){
+	return maxPSEQ;
+}
+ssize_t MessageHistory::get_maxASEQ(){
+	return maxASEQ;
+}
 
 Message MessageHistory::createMessage(ssize_t type, string processID, ssize_t messageID, string data){
 	Message msg;

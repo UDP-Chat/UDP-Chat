@@ -18,6 +18,10 @@ public:
 	virtual ~HoldbackQueue();
 
 	std::vector<HoldBackQueueItem> queue;
+
+	void put(HoldBackQueueItem item);
+private:
+	static bool compareSeq(const HoldBackQueueItem&,const HoldBackQueueItem&);
 };
 
 #endif /* HOLDBACKQUEUE_H_ */

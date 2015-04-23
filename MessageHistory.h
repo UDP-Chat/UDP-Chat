@@ -31,6 +31,8 @@ public:
 	string getIP(string ip_port);
 	string getPort(string ip_port);
 
+	ssize_t get_maxPSEQ();
+	ssize_t get_maxASEQ();
 
 	bool existMessage(ssize_t type, string processID, ssize_t messageID);
 	bool existMessage(Message m);
