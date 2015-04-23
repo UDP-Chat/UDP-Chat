@@ -65,7 +65,7 @@ void HeartBeat::checkAlive(){
 void HeartBeat::confirmBeat(string pid){
 	Message message=messageStore->createMessage(TYPE_CHECKALIVE , pid, MESSAGE_ID_CHECKALIVE, "");
 	Message expectedReply=messageStore->createMessage(TYPE_COMFIRMALIVE, pid, MESSAGE_ID_COMFIRMALIVE, "");
-	messageStore->sendMessageTimeoutTo(pid, message, expectedReply, "   confirming alive with "+pid);
+	messageStore->sendMessageTimeoutTo(pid, message, expectedReply, "   confirming alive with "+pid, true);
 }
 
 void HeartBeat::sendHeartBeat(){

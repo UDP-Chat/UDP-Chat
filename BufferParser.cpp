@@ -27,8 +27,8 @@ void BufferParser::parse_buffer(Message* message){
 
 //	cout << "   received message from "+messageStore->to_string(m2)<< endl;
 
-	switch(m.type){
-	case TYPE_DATA://finished
+	switch(m2.type){
+	case TYPE_DATA://finDieished
 		members->parseNEWorDATA(m2);
 		break;
 	case TYPE_PSEQ://finished.
@@ -50,9 +50,9 @@ void BufferParser::parse_buffer(Message* message){
 		if(messageStore->checkout(m2))return;
 		members->parseList(m2);
 		break;
-	case TYPE_DIE:
-		break;
 	case TYPE_LEAVE:
+		if(messageStore->checkout(m2))return;
+		members->parseLEAVE(m2);
 		break;
 	case TYPE_HEARTBEAT://finished.
 		break;
