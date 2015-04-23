@@ -102,7 +102,12 @@ string UDP::getLocalIP(){
 	return res;
 }
 
-int UDP::udp_send_msg(string host_in, string port_in, Message msg_in){
+
+int UDP::send_msg(string processID, Message message){
+	return this->send_msg(messageStore->getIP(processID), messageStore->getPort(processID), message);
+}
+
+int UDP::send_msg(string host_in, string port_in, Message msg_in){
 		const char* host_addr=host_in.c_str();
 		int port=atoi(port_in.c_str());
 		//const char* msg=msg_in.c_str();

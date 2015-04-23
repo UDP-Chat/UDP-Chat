@@ -20,36 +20,37 @@ BufferParser::~BufferParser() {
 
 
 void BufferParser::parse_buffer(Message* message){
-	Message m;
-	memcpy(m.processId,message->processId,strlen(message->processId));
-	memcpy(m.data,message->data,strlen(message->data));
-	m.messageId=message->messageId;
-	m.type=message->type;
+	Message m=messageStore->createMessage(message);
+	heartBeat->parseMessage(m);
 
-	switch(message->type){
-	case TYPE_DATA:
+	switch(m.type){
+	case TYPE_DATA://finished
+		members->parseNEWorDATA(m);
 		break;
-	case TYPE_PSEQ:
+	case TYPE_PSEQ://finished.
+		messageStore->checkout(m);
 		break;
 	case TYPE_ASEQ:
+		members->parseASEQ(m);
 		break;
-	case TYPE_ACK:
+	case TYPE_ACK://finished.
+		messageStore->checkout(m);
 		break;
-	case TYPE_JOIN:
-		members->parseJoin(m);
+	case TYPE_JOIN://finished.
+		members->parseJOIN(m);
 		break;
-	case TYPE_NEW:
-		members->parseNew(m);
+	case TYPE_NEW://finished.
+		members->parseNEWorDATA(m);
 		break;
-	case TYPE_LIST:
+	case TYPE_LIST://finished.
+		if(messageStore->checkout(m))return;
 		members->parseList(m);
 		break;
 	case TYPE_DIE:
 		break;
 	case TYPE_LEAVE:
 		break;
-	case TYPE_HEARTBEAT:
-		heartBeat->parseMessage(m);
+	case TYPE_HEARTBEAT://finished.
 		break;
 	default:
 		break;

@@ -17,6 +17,7 @@ class Messages {
 public:
 	Messages();
 	virtual ~Messages();
+	sem_t lock;
 
 	// max number that has sent
 	ssize_t maxMessageId;
@@ -27,6 +28,7 @@ public:
 	//ssize_t messageId;
 
 	Message createMessage(ssize_t type, string processID, ssize_t messageID, string data);
+	Message createMessage(Message* m);
 	Message2 convert_message_to_cpp(Message m);
 	string getIP(string ip_port);
 	string getPort(string ip_port);
@@ -43,14 +45,23 @@ public:
 	void putMessage(Message m);
 	void putMessage(Message2 m);
 
+	bool checkout(Message m);
+	bool checkout(Message* m);
+
 	ssize_t maxPSEQ;
 	ssize_t maxASEQ;
 
+	bool sendJOIN(string group_processId);
+	void sendNEW();
+	void sendASEQ(ssize_t messageID, int maxASEQ);
+	void sendACK(string processID, Message m);
+	void sendDATA(string content);
+
 private:
 	std::unordered_map<std::string,std::string> receivedMessages;
-	sem_t lock;
-
-
+	string getKey(ssize_t type, string pid, ssize_t mid);
+	void sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString);
+	void sendFourway(ssize_t type, ssize_t messageID, string data, string printString);
 };
 
 #endif /* MESSAGES_H_ */
