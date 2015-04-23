@@ -42,7 +42,7 @@ void Members::parseJOIN(Message2 message){
 	string data;
 	// add itself into the list
 	data = udp->processID + "#" + udp->name;
-	cout << data << endl;
+
 	// add other members into the list
 	for(auto it=memberList.begin();it!=memberList.end();++it){
 		data = data + " " + (*it).first+"#"+(*it).second.name;
@@ -94,6 +94,11 @@ void Members::addMember(string processid, string name){
 	this->memberList.insert(newPair);
 }
 
+void Members::printMemberList(){
+	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+					cout << (*it).second.name << " " << (*it).first<<endl;
+			}
+}
 
 void Members::reportDie(string pid){
 	//TODO

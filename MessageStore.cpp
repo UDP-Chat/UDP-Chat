@@ -236,7 +236,6 @@ void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, str
 		if(pseq>maxPSEQ)maxPSEQ=pseq;
 	}
 
-	//TODO update local max ASEQ
 
 	messageStore->sendASEQ(messageID, maxPSEQ);
 }
