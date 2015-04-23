@@ -17,6 +17,15 @@ typedef struct {
 	char data[10240];
 } Message;
 
+typedef struct {
+	ssize_t type;
+	string processId;
+	string processIP;
+	string processPort;
+	ssize_t messageId;
+	string data;
+} Message2;
+
 typedef struct{
 	Message m;
 	bool deliverable;

@@ -27,13 +27,23 @@ public:
 	//ssize_t messageId;
 
 	Message createMessage(ssize_t type, string processID, ssize_t messageID, string data);
+	Message2 convert_message_to_cpp(Message m);
+	string getIP(string ip_port);
+	string getPort(string ip_port);
 
 
-private:
-	std::unordered_map<std::string,std::string> receivedMessage;
+	bool existMessage(ssize_t type, string processID, ssize_t messageID);
+	bool existMessage(Message m);
+	bool existMessage(Message2 m);
+
+	string getMessageData(ssize_t type, string processID, ssize_t messageID);
 
 	ssize_t maxPSEQ;
 	ssize_t maxASEQ;
+private:
+	std::unordered_map<std::string,std::string> receivedMessages;
+
+
 };
 
 #endif /* MESSAGEHISTORY_H_ */

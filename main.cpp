@@ -34,16 +34,6 @@ void start_group(string name){
 
 }
 
-string getIP(string ip_port){
-	std::string delimiter = ":";
-	std::string ip = ip_port.substr(0, ip_port.find(delimiter));
-	return ip;
-}
-
-string getPort(string ip_port){
-	std::string ip = ip_port.substr(getIP(ip_port).length()+1);
-	return ip;
-}
 
 void start_as_guest(string name, string group_address){
 	std::thread t(&UDP::start_listen, udp, name);
@@ -59,7 +49,7 @@ void start_as_guest(string name, string group_address){
 
 	Message msg=messageHistory->createMessage(TYPE_JOIN,udp->processID,0,name);
 
-	udp->udp_send_msg(getIP(group_address),getPort(group_address),msg);
+	udp->udp_send_msg(messageHistory->getIP(group_address),messageHistory->getPort(group_address),msg);
 
 	cout << "JOIN sent" << endl;
 
