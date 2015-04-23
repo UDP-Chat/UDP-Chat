@@ -66,8 +66,6 @@ Message2 MessageStore::convert_message_to_cpp(Message m){
 	Message2 res;
 	res.type=m.type;
 	res.processId=string(m.processId);
-	res.processIP=getIP(res.processId);
-	res.processPort=getPort(res.processId);
 	res.messageId=m.messageId;
 	res.data=string(m.data);
 	return res;
@@ -95,6 +93,12 @@ string MessageStore::getMessageData(ssize_t type, string processID, ssize_t mess
 	string res=receivedMessages.find(this->getKey(type,processID,messageID))->second;
 	sem_post(&lock);
 	return res;
+}
+
+string MessageStore::updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data){
+	sem_wait(&lock);
+	receivedMessages.find(this->getKey(type,processID,messageID))->second=new_data;
+	sem_post(&lock);
 }
 
 
@@ -170,7 +174,7 @@ void MessageStore::sendASEQ(ssize_t messageID, int aseq){
 	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
 		string pid=(*it).first;
 		Message expectedReply=createMessage(TYPE_ACK, pid, messageID,"");
-		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, "   sending ASEQ to "+pid+" ...");
+		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, "   sending ASEQ to "+pid+" ...", true);
 		i++;
 	}
 
@@ -183,7 +187,7 @@ void MessageStore::sendASEQ(ssize_t messageID, int aseq){
 }
 
 
-void MessageStore::sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString){
+void MessageStore::sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString, bool reportNoResponse){
 	int trials=0;
 
 
@@ -196,7 +200,7 @@ void MessageStore::sendMessageTimeoutTo(string processID, Message message, Messa
 
 
 	if(this->existMessage(expectedReply)==false){
-		members->reportDie(processID);
+		members->reportNoResponse(processID);
 	}
 }
 
@@ -237,7 +241,7 @@ void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, str
 	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
 		string pid=(*it).first;
 		Message expectedReply=createMessage(TYPE_PSEQ, pid, messageID,"");
-		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, printString+pid+" ...");
+		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, printString+pid+" ...", true);
 		i++;
 	}
 
@@ -250,8 +254,10 @@ void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, str
 	int maxPSEQ=-1;
 	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
 		string pid=(*it).first;
-		int pseq=atoi(messageStore->getMessageData(TYPE_PSEQ, pid, messageID).c_str());
-		if(pseq>maxPSEQ)maxPSEQ=pseq;
+		if(messageStore->existMessage(TYPE_PSEQ, pid, messageID)){//if left ignore
+			int pseq=atoi(messageStore->getMessageData(TYPE_PSEQ, pid, messageID).c_str());
+			if(pseq>maxPSEQ)maxPSEQ=pseq;
+		}
 	}
 
 	if(maxPSEQ > messageStore->get_maxASEQ()){
@@ -259,6 +265,28 @@ void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, str
 	}
 
 	messageStore->sendASEQ(messageID, maxPSEQ);
+}
+
+void MessageStore::sendLEAVE(string pid){
+	Message leave=messageStore->createMessage(TYPE_LEAVE, pid, MESSAGE_ID_LEAVE,"");
+	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+		string pid=(*it).first;
+		udp->send_msg(pid, leave);
+	}
+}
+
+
+void MessageStore::sendASK_ASEQ(string processID, ssize_t messageID){
+	Message ask=createMessage(TYPE_ASK_ASEQ, udp->processID, messageID, processID);
+	Message expectedReply=createMessage(TYPE_ASEQ, processID, messageID,"");
+	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+		string pid=(*it).first;
+		this->sendMessageTimeoutTo(pid, ask, expectedReply, "   sending ASEQ to "+pid+" ...", false);
+	}
+
+	if(existMessage(expectedReply)==false){
+		holdbackQueue->removeMessage(processID, messageID);
+	}
 }
 
 
@@ -273,9 +301,6 @@ string MessageStore::to_string(Message2 m2){
 		break;
 	case TYPE_DATA:
 		type="DATA";
-		break;
-	case TYPE_DIE:
-		type="DIE";
 		break;
 	case TYPE_HEARTBEAT:
 		type="HEARTBEAT";

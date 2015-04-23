@@ -39,6 +39,7 @@ public:
 	bool existMessage(Message2 m);
 
 	string getMessageData(ssize_t type, string processID, ssize_t messageID);
+	string updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data);
 
 	void putMessage(Message m);
 	void putMessage(Message2 m);
@@ -55,7 +56,10 @@ public:
 	void sendACK(string processID, Message m);
 	void sendDATA(string content);
 	string to_string(Message2 m2);
-	void sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString);
+	void sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString, bool reportNoResponse);
+	void sendLEAVE(string processID);
+
+	void sendASK_ASEQ(string processID, ssize_t messageID);
 
 private:
 	//key has the following structure, linked with #

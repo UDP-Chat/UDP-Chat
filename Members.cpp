@@ -19,16 +19,22 @@ Members::~Members() {
 }
 
 void Members::parseNEWorDATA(Message2 message){
-
-	int pseq = max(messageStore->MessageStore::get_maxPSEQ(),messageStore->MessageStore::get_maxASEQ())+1;
-	messageStore->set_maxPSEQ(pseq);
+	int pseq;
 	if(messageStore->checkout(message)==false){
+		pseq = max(messageStore->MessageStore::get_maxPSEQ(),messageStore->MessageStore::get_maxASEQ())+1;
+		messageStore->set_maxPSEQ(pseq);
 		// put into hold back queue
 		HoldBackQueueItem item;
 		item.Seq = pseq;
 		item.deliverable = false;
 		item.m = message;
+
+		//save pseq into DATA message data
+		messageStore->updateMessageData(message.type, message.processId, message.messageId, to_string(pseq));
+
 		holdbackQueue->put(item);
+	}else{
+		pseq=atoi(messageStore->getMessageData(message.type, message.processId, message.messageId).c_str());
 	}
 
 	// send PSEQ
@@ -102,15 +108,26 @@ void Members::printMemberList(){
 			}
 }
 
-void Members::reportDie(string pid){
-	//TODO
-	cout << pid +" is dead."<<endl;
+void Members::reportNoResponse(string pid){
+	cout<<"REPORTING LEAVE"<<endl;
 
+	//send report to others
+	std::thread t(&MessageStore::sendLEAVE, messageStore, pid);
+	t.detach();
 
-
-
+	//send report to self
+	Message leave=messageStore->createMessage(TYPE_LEAVE, pid, MESSAGE_ID_LEAVE,"");
+	std::thread t2(&BufferParser::parse_buffer, bufferParser, (Message*)&leave);
+	t2.detach();
 }
 
+string Members::getName(string pid){
+	if(memberList.count(pid)>0){
+		return memberList.find(pid)->second.name;
+	}else{
+		return pid;
+	}
+}
 
 void Members::parseASEQ(Message2 msg){
 	if(messageStore->checkout(msg)==false){
@@ -127,4 +144,18 @@ void Members::parseASEQ(Message2 msg){
 	messageStore->sendACK(msg.processId, ack);
 }
 
+void Members::parseLEAVE(Message2 msg){
+	cout << "NOTICE "+this->getName(msg.processId)+" on "+msg.processId+" left the chat group." << endl;
+
+
+
+	for each item in holdbackQueue{
+		Message pending =item.m;
+
+
+	}
+
+	//TODO
+
+}
 

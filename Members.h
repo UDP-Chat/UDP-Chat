@@ -31,11 +31,13 @@ public:
 	void parseNEWorDATA(Message2 msg);
 	void parseASEQ(Message2 msg);
 	void parseDATA(Message2 msg);
+	void parseLEAVE(Message2 msg);
 
 	void split(const std::string &s, char delim, std::vector<std::string> &elems);
 	void addMember(string processid, string name);
 
-	void reportDie(string pid);
+	void reportNoResponse(string pid);
+	string getName(string pid);
 
 	void printMemberList();
 };

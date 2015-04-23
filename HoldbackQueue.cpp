@@ -58,7 +58,7 @@ void HoldbackQueue::findDeliverable(){
 					if(msg.processId.compare(udp->processID)==0){
 						name = udp->name;
 					}else{
-						name = members->memberList.find(msg.processId)->second.name;
+						name = members->getName(msg.processId);
 					}
 
 					string chat=msg.data;
