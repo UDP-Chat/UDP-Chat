@@ -17,10 +17,11 @@ class MessageStore {
 public:
 	MessageStore();
 	virtual ~MessageStore();
-	sem_t lock;
+	sem_t lock_receivedMessages;
+	sem_t lock_maxMessageId;
+	sem_t lock_maxPSEQ;
+	sem_t lock_maxASEQ;
 
-	// max number that has sent
-	ssize_t maxMessageId;
 
 
 	Message createMessage(ssize_t type, string processID, ssize_t messageID, string data);
@@ -47,8 +48,7 @@ public:
 	bool checkout(Message2 m);
 	bool checkout(Message* m);
 
-	ssize_t maxPSEQ;
-	ssize_t maxASEQ;
+
 
 	bool sendJOIN(string group_processId);
 	void sendNEW();
@@ -61,7 +61,16 @@ public:
 
 	void sendASK_ASEQ(string processID, ssize_t messageID);
 
+	string encrypt(string);
+	string decrypt(string);
+
 private:
+	// max number that has sent
+	ssize_t maxMessageId;
+	ssize_t maxPSEQ;
+	ssize_t maxASEQ;
+
+
 	//key has the following structure, linked with #
 	//ssize_t type;
 	//std::string processId;

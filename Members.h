@@ -20,7 +20,7 @@ class Members {
 public:
 	Members();
 	virtual ~Members();
-	sem_t lock;
+	sem_t lock_memberList;
 
 	// key is the process id defined as "ip:port" string
 	// value is the last contact time
@@ -40,6 +40,7 @@ public:
 	string getName(string pid);
 
 	void printMemberList();
+
 };
 
 #endif /* MEMBERS_H_ */

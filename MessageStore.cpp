@@ -13,7 +13,12 @@ MessageStore::MessageStore() {
 	maxMessageId = 0;
 	maxPSEQ = 0;
 	maxASEQ = 0;
-	sem_init(&lock, 0, 1);
+
+	sem_init(&lock_receivedMessages, 0, 1);
+	sem_init(&lock_maxMessageId, 0, 1);
+	sem_init(&lock_maxPSEQ, 0, 1);
+	sem_init(&lock_maxASEQ, 0, 1);
+
 }
 
 MessageStore::~MessageStore() {
@@ -82,23 +87,23 @@ bool MessageStore::existMessage(Message2 m){
 
 
 bool MessageStore::existMessage(ssize_t type, string processID, ssize_t messageID){
-	sem_wait(&lock);
+	sem_wait(&lock_receivedMessages);
 	bool res=receivedMessages.count(this->getKey(type,processID,messageID))>0;
-	sem_post(&lock);
+	sem_post(&lock_receivedMessages);
 	return res;
 }
 
 string MessageStore::getMessageData(ssize_t type, string processID, ssize_t messageID){
 	sem_wait(&lock);
 	string res=receivedMessages.find(this->getKey(type,processID,messageID))->second;
-	sem_post(&lock);
+	sem_post(&lock_receivedMessages);
 	return res;
 }
 
 string MessageStore::updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data){
 	sem_wait(&lock);
 	receivedMessages.find(this->getKey(type,processID,messageID))->second=new_data;
-	sem_post(&lock);
+	sem_post(&lock_receivedMessages);
 }
 
 
@@ -118,7 +123,7 @@ void MessageStore::putMessage(Message2 m2){
 	sem_wait(&lock);
 	pair<string, string> p(this->getKey(m2.type,m2.processId,m2.messageId),m2.data);
 	receivedMessages.insert(p);
-	sem_post(&lock);
+	sem_post(&lock_receivedMessages);
 }
 
 
@@ -325,4 +330,21 @@ string MessageStore::to_string(Message2 m2){
 }
 
 
+/* Encryption referenced from http://www.cplusplus.com/forum/windows/128374/ */
+std::string encrypt(std::string msg, std::string key)
+{
+    // Make sure the key is at least as long as the message
+    std::string tmp(key);
+    while (key.size() < msg.size())
+        key += tmp;
+
+    // And now for the encryption part
+    for (std::string::size_type i = 0; i < msg.size(); ++i)
+        msg[i] ^= key[i];
+    return msg;
+}
+std::string decrypt(std::string msg, std::string key)
+{
+    return encrypt(msg, key); // lol
+}
 
