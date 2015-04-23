@@ -61,8 +61,8 @@ public:
 
 	void sendASK_ASEQ(string processID, ssize_t messageID);
 
-	string encrypt(string);
-	string decrypt(string);
+	std::string encrypt(std::string, std::string const& key);
+	std::string decrypt(std::string, std::string const& key);
 
 private:
 	// max number that has sent

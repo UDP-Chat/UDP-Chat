@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 Members::Members() {
-	sem_init(&lock, 0, 1);
+	sem_init(&lock_memberList, 0, 1);
 }
 
 Members::~Members() {
@@ -30,7 +30,10 @@ void Members::parseNEWorDATA(Message2 message){
 		item.m = message;
 
 		//save pseq into DATA message data
-		messageStore->updateMessageData(message.type, message.processId, message.messageId, to_string(pseq));
+//		messageStore->updateMessageData(message.type, message.processId, message.messageId, to_string(pseq));
+		Message2 update=message;
+		update.data=to_string(pseq);
+		messageStore->putMessage(update);
 
 		holdbackQueue->put(item);
 	}else{
@@ -151,14 +154,14 @@ void Members::parseLEAVE(Message2 msg){
 
 	std::vector<Message2> list;
 	for(int i=0; i< holdbackQueue->queue.size();i++ ){
-
 		Message2 pending =holdbackQueue->queue[i].m;
 		list.push_back(pending);
 	}
-	for(int i=0;i<list.size();i++){
-		list[i];
-	}
-	//TODO
 
+	for(int i=0;i<list.size();i++){
+		Message2 m=list[i];
+		std::thread t(&MessageStore::sendASK_ASEQ, messageStore, m.processId, m.messageId);
+		t.detach();
+	}
 
 }

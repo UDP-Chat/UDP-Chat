@@ -60,7 +60,15 @@ ssize_t UDP::start_listen(string name) {
 //		cout << "received connection" << endl;
 		char received_buf[sizeof(Message)];
 		memcpy(received_buf, buf, n);
-		std::thread t(&BufferParser::parse_buffer, bufferParser, (Message*)received_buf);
+
+		Message* msg_in=(Message*)received_buf;
+		if(encrypt){
+			string data=string(msg_in->data);
+			data=messageStore->decrypt(data, password);
+			memcpy(msg_in->data,data.c_str(),data.length()+1);
+		}
+
+		std::thread t(&BufferParser::parse_buffer, bufferParser, msg_in);
 		t.detach();
 	}
 
@@ -108,6 +116,13 @@ int UDP::send_msg(string processID, Message message){
 }
 
 int UDP::send_msg(string host_in, string port_in, Message msg_in){
+		if(encrypt){
+			string data=string(msg_in.data);
+			data=messageStore->encrypt(data, password);
+			memcpy(msg_in.data,data.c_str(),data.length()+1);
+		}
+
+
 		const char* host_addr=host_in.c_str();
 		int port=atoi(port_in.c_str());
 		//const char* msg=msg_in.c_str();

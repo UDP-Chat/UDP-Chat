@@ -31,6 +31,9 @@
 
 class UDP {
 public:
+	bool encrypt=false;
+	string password="cis505";
+
 	bool started;
 	std::string ip;
 	int port;

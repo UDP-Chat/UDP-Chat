@@ -94,14 +94,14 @@ bool MessageStore::existMessage(ssize_t type, string processID, ssize_t messageI
 }
 
 string MessageStore::getMessageData(ssize_t type, string processID, ssize_t messageID){
-	sem_wait(&lock);
+	sem_wait(&lock_receivedMessages);
 	string res=receivedMessages.find(this->getKey(type,processID,messageID))->second;
 	sem_post(&lock_receivedMessages);
 	return res;
 }
 
 string MessageStore::updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data){
-	sem_wait(&lock);
+	sem_wait(&lock_receivedMessages);
 	receivedMessages.find(this->getKey(type,processID,messageID))->second=new_data;
 	sem_post(&lock_receivedMessages);
 }
@@ -120,7 +120,7 @@ bool MessageStore::checkout(Message* m){
 }
 
 void MessageStore::putMessage(Message2 m2){
-	sem_wait(&lock);
+	sem_wait(&lock_receivedMessages);
 	pair<string, string> p(this->getKey(m2.type,m2.processId,m2.messageId),m2.data);
 	receivedMessages.insert(p);
 	sem_post(&lock_receivedMessages);
@@ -331,20 +331,21 @@ string MessageStore::to_string(Message2 m2){
 
 
 /* Encryption referenced from http://www.cplusplus.com/forum/windows/128374/ */
-std::string encrypt(std::string msg, std::string key)
+std::string MessageStore::encrypt(std::string msg, std::string const& key)
 {
-    // Make sure the key is at least as long as the message
-    std::string tmp(key);
-    while (key.size() < msg.size())
-        key += tmp;
+    // Side effects if the following is not written:
+    // In my case, division by 0.
+    // In the other case, stuck in an infinite loop.
+    if(!key.size())
+        return msg;
 
-    // And now for the encryption part
     for (std::string::size_type i = 0; i < msg.size(); ++i)
-        msg[i] ^= key[i];
+        msg[i] ^= key[i%key.size()];
     return msg;
 }
-std::string decrypt(std::string msg, std::string key)
+
+// Rewritten to use const& on both parameters
+std::string MessageStore::decrypt(std::string msg, std::string const& key)
 {
     return encrypt(msg, key); // lol
 }
-
