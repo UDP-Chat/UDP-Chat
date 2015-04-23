@@ -42,7 +42,8 @@ public:
 	string getLocalIP();
 	static const ssize_t BUF_SIZE=10240;
 
-	int udp_send_msg(string host_in, string port_in, Message msg_in);
+	int send_msg(string host_in, string port_in, Message msg_in);
+	int send_msg(string processID, Message msg_in);
 };
 
 #endif /* UDP_H_ */

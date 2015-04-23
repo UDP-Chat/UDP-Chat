@@ -17,6 +17,8 @@ public:
 	virtual ~HeartBeat();
 
 	void parseMessage(Message message);
+
+	void startMonitor();
 };
 
 #endif /* HEARTBEAT_H_ */

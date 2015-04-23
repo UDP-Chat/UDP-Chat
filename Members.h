@@ -20,18 +20,22 @@ class Members {
 public:
 	Members();
 	virtual ~Members();
+	sem_t lock;
 
 	// key is the process id defined as "ip:port" string
 	// value is the last contact time
 	std::unordered_map<std::string,MemberInfo> memberList;
 
-	void parseJoin(Message msg);
+	void parseJOIN(Message msg);
 	void parseList(Message msg);
-	void parseNew(Message msg);
+	void parseNEWorDATA(Message msg);
+	void parseASEQ(Message msg);
+	void parseDATA(Message msg);
 
-	void sendNew(string processid);
 	void split(const std::string &s, char delim, std::vector<std::string> &elems);
 	void addMember(string processid, string name);
+
+	void reportDie(string pid);
 };
 
 #endif /* MEMBERS_H_ */

@@ -20,6 +20,13 @@
 #define TYPE_LEAVE 10
 #define TYPE_HEARTBEAT 11
 
+#define MESSAGE_ID_JOIN -3
+#define MESSAGE_ID_LIST -2
+#define MESSAGE_ID_NEW -1
+
+#define MAX_TRAILS 13
+#define RESEND_INTERVAL 2
+
 #include <thread>
 #include <iostream>
 #include <semaphore.h>
@@ -30,7 +37,7 @@ using namespace std;
 #include "HeartBeat.h"
 #include "HoldbackQueue.h"
 #include "Members.h"
-#include "Messages.h"
+#include "MessageStore.h"
 #include "UDP.h"
 #include "BufferParser.h"
 

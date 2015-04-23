@@ -12,44 +12,34 @@
 #include <unordered_map>
 
 Members::Members() {
-	// TODO Auto-generated constructor stub
-
+	sem_init(&lock, 0, 1);
 }
 
 Members::~Members() {
-	// TODO Auto-generated destructor stub
 }
 
-void Members::parseNew(Message buffer){
-	// put into hold back queue
-	HoldBackQueueItem item;
-	int pseq = max(messageStore->Messages::get_maxPSEQ(),messageStore->Messages::get_maxASEQ())+1;
-	item.Seq = pseq;
-	item.deliverable = false;
-	item.m = buffer;
+void Members::parseNEWorDATA(Message message){
+
+	int pseq = max(messageStore->MessageStore::get_maxPSEQ(),messageStore->MessageStore::get_maxASEQ())+1;
+
+	if(messageStore->checkout(message)==false){
+		// put into hold back queue
+		HoldBackQueueItem item;
+		item.Seq = pseq;
+		item.deliverable = false;
+		item.m = message;
+		holdbackQueue->put(item);
+	}
 
 	// send PSEQ
-	Message msg;
-	msg.processId = udp->processID;
-	msg.messageId = buffer.messageId;
-	msg.type = TYPE_PSEQ;
-	string s(pseq);
-	memcpy(msg.data,s.c_str(),s.length()+1);
-	string s(buffer.processId);
-	string sendToIP = s.substr(0,s.find(":"));
-	string sendToPort = s.substr(s.find(":")+1);
-	udp->udp_send_msg(sendToIP,sendToPort,msg);
+	Message msg=messageStore->createMessage(TYPE_PSEQ, udp->processID, message.messageId, to_string(pseq));
+	udp->send_msg(message.processId,msg);
 }
 
-void Members::parseJoin(Message buffer){
+void Members::parseJOIN(Message message){
 	// After received a Join message, should return a List message
-	Message msg;
 
-	string data,sendToIP,sendToPort;
-	msg.type = TYPE_LIST;
-	memcpy(msg.processId,udp->processID.c_str(),udp->processID.length()+1);
-	msg.messageId=0;
-
+	string data;
 	// add itself into the list
 	data = udp->processID + "#" + udp->name;
 	cout << data << endl;
@@ -57,13 +47,11 @@ void Members::parseJoin(Message buffer){
 	for(auto it=memberList.begin();it!=memberList.end();++it){
 		data = data + " " + (*it).first+"#"+(*it).second.name;
 	}
-	memcpy(msg.data,data.c_str(),data.length()+1);
 
-	string s(buffer.processId);
-	sendToIP = s.substr(0,s.find(":"));
-	sendToPort = s.substr(s.find(":")+1);
+	Message msg=messageStore->createMessage(TYPE_LIST, udp->processID, MESSAGE_ID_LIST, data);
 
-	udp->udp_send_msg(sendToIP,sendToPort,msg);
+
+	udp->send_msg(message.processId,msg);
 }
 
 void Members::parseList(Message msg){
@@ -82,12 +70,9 @@ void Members::parseList(Message msg){
 		memberList.insert(ele);
 	}
 
-	// send NEW message to all the members in the group
-	for(auto it=memberList.begin();it!=memberList.end();++it){
-		//TODO
-		// This is a test for receive list message
-		std::thread t(&Members::sendNew, members, (*it).first);
-	}
+	messageStore->sendNEW();
+
+
 }
 
 void Members::split(const std::string &s, char delim, std::vector<std::string> &elems) {
@@ -99,17 +84,6 @@ void Members::split(const std::string &s, char delim, std::vector<std::string> &
 
 }
 
-void Members::sendNew(string processId){
-	Message msg;
-	msg.type=TYPE_NEW;
-	msg.messageId=0;
-	memcpy(msg.processId,udp->processID.c_str(),udp->processID.length()+1);
-	memcpy(msg.data,udp->name.c_str(),udp->name.length()+1);
-	string s(processId);
-	string sendToIP = s.substr(0,s.find(":"));
-	string sendToPort = s.substr(s.find(":")+1);
-	udp->udp_send_msg(sendToIP,sendToPort,msg);
-}
 
 void Members::addMember(string processid, string name){
 	MemberInfo mi;
@@ -119,3 +93,23 @@ void Members::addMember(string processid, string name){
 	pair<std::string,MemberInfo> newPair(processid,mi);
 	this->memberList.insert(newPair);
 }
+
+
+void Members::reportDie(string pid){
+	//TODO
+}
+
+
+void Members::parseASEQ(Message msg){
+	if(messageStore->checkout(msg)==false){
+		//TODO
+		//update aseq
+		//deliever
+
+	}
+
+	Message ack=messageStore->createMessage(TYPE_ACK, udp->processID, msg.messageId, "");
+	messageStore->sendACK(msg.processId, ack);
+}
+
+

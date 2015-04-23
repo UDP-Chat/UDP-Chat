@@ -47,6 +47,8 @@ void HoldbackQueue::findDeliverable(){
 				// delete the already delivered message
 				queue.erase(queue.begin()+i);
 				i--;
+			}else{
+				break;
 			}
 		}
 }
