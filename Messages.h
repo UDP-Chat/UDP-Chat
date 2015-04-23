@@ -21,10 +21,6 @@ public:
 	// max number that has sent
 	ssize_t maxMessageId;
 
-	//key has the following structure, linked with #
-	//ssize_t type;
-	//std::string processId;
-	//ssize_t messageId;
 
 	Message createMessage(ssize_t type, string processID, ssize_t messageID, string data);
 	Message2 convert_message_to_cpp(Message m);
@@ -47,6 +43,10 @@ public:
 	ssize_t maxASEQ;
 
 private:
+	//key has the following structure, linked with #
+	//ssize_t type;
+	//std::string processId;
+	//ssize_t messageId;
 	std::unordered_map<std::string,std::string> receivedMessages;
 	sem_t lock;
 
