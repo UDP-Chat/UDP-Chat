@@ -22,6 +22,7 @@ public:
 	void put(HoldBackQueueItem item);
 private:
 	static bool compareSeq(const HoldBackQueueItem&,const HoldBackQueueItem&);
+	void HoldbackQueue::findDeliverable();
 };
 
 #endif /* HOLDBACKQUEUE_H_ */

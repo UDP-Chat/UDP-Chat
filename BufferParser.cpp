@@ -36,9 +36,7 @@ void BufferParser::parse_buffer(Message* message){
 	case TYPE_ACK:
 		break;
 	case TYPE_JOIN:
-		cout<<"hi";
 		members->parseJoin(m);
-		cout<<"e";
 		break;
 	case TYPE_NEW:
 		members->parseNew(m);

@@ -24,25 +24,29 @@ HoldbackQueue::~HoldbackQueue() {
 
 void HoldbackQueue::put(HoldBackQueueItem item){
 	this->queue.push_back(item);
+}
+
+void HoldbackQueue::findDeliverable(){
 	// sort the queue to find any deliverable messages
 	std::sort(queue.begin(),queue.end(),HoldbackQueue::compareSeq);
 
 	// find deliverable messages
-	for(int i=0;i<queue.size();i++){
-		if(queue[i].deliverable){
-			Message msg = queue[i].m;
-			if(queue[i].m.type==TYPE_NEW){ // add a new member
-				string pid(msg.processId);
+		for(int i=0;i<queue.size();i++){
+			if(queue[i].deliverable){
+				Message msg = queue[i].m;
 				string name(msg.data);
-				members->addMember(pid,name);
-			}
-			else{ // a chat message
+				if(queue[i].m.type==TYPE_NEW){ // add a new member
+					string pid(msg.processId);
 
+					members->addMember(pid,name);
+				}
+				else{ // a chat message
+					string chat(msg.data);
+					cout << name << ":: " << chat << endl;
+				}
+				// delete the already delivered message
+				queue.erase(queue.begin()+i);
+				i--;
 			}
-			// delete the already delivered message
-			queue.erase(queue.begin()+i);
-			i--;
 		}
-	}
-
 }

@@ -28,6 +28,17 @@ void Members::parseNew(Message buffer){
 	item.deliverable = false;
 	item.m = buffer;
 
+	// send PSEQ
+	Message msg;
+	msg.processId = udp->processID;
+	msg.messageId = buffer.messageId;
+	msg.type = TYPE_PSEQ;
+	string s(pseq);
+	memcpy(msg.data,s.c_str(),s.length()+1);
+	string s(buffer.processId);
+	string sendToIP = s.substr(0,s.find(":"));
+	string sendToPort = s.substr(s.find(":")+1);
+	udp->udp_send_msg(sendToIP,sendToPort,msg);
 }
 
 void Members::parseJoin(Message buffer){
