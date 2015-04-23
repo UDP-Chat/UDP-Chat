@@ -10,12 +10,9 @@
 
 
 HeartBeat::HeartBeat() {
-	// TODO Auto-generated constructor stub
-
 }
 
 HeartBeat::~HeartBeat() {
-	// TODO Auto-generated destructor stub
 }
 
 

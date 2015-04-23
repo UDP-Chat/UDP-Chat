@@ -30,6 +30,19 @@ void start_group(){
 	cout << "Succeeded, current users:" << endl;
 	cout << udp->name << " " << udp->processID << endl;
 	cout << "Waiting for others to join..." << endl;
+
+	string input;
+	while(true){
+		cin >> input;
+		if(cin.eof()){
+			cout << "Quitting chat..." << endl;
+			break;
+		}else{
+			cout << "   sending chat..."<<endl;
+			messageStore->sendDATA(input);
+		}
+	}
+
 	t.join();
 
 }
@@ -52,6 +65,18 @@ void start_as_guest(string group_address){
 	}else{
 		cout << "JOIN fail" << endl;
 		exit (EXIT_FAILURE);
+	}
+
+	string input;
+	while(true){
+		cin >> input;
+		if(cin.eof()){
+			cout << "Quitting chat..." << endl;
+			break;
+		}else{
+			cout << "   sending chat..."<<endl;
+			messageStore->sendDATA(input);
+		}
 	}
 
 	t.join();
