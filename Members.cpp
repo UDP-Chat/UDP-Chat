@@ -127,4 +127,6 @@ void Members::parseASEQ(Message2 msg){
 	messageStore->sendACK(msg.processId, ack);
 }
 
+void Members::sendLeave(){
 
+}

@@ -36,6 +36,7 @@ public:
 	void addMember(string processid, string name);
 
 	void reportDie(string pid);
+	void sendLeave();
 
 	void printMemberList();
 };

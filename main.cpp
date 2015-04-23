@@ -28,6 +28,7 @@ void inputLoop(){
 		if(cin.eof()){
 			cout << "Quitting chat..." << endl;
 			//TODO
+
 			break;
 		}else{
 //			cout << "   sending chat..."<<endl;
