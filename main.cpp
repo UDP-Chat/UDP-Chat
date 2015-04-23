@@ -57,13 +57,15 @@ void start_as_guest(string group_address){
 
 	cout << udp->name << " joing a new chat on " << group_address
 			<<", listening on " << udp->processID << endl;
-	//TODO print current user
-	//cout << Succeeded, current
 
+	// print out current user list
 	if(messageStore->sendJOIN(group_address)){
-		cout << "JOIN success" << endl;
+		cout << "Succeeded, current users:" << endl;
+		for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+				cout << (*it).second.name << " " << (*it).first<<endl;
+		}
 	}else{
-		cout << "JOIN fail" << endl;
+		cout << "Sorry, no chat is active on " << group_address<< ", try again later. Bye." << endl;
 		exit (EXIT_FAILURE);
 	}
 

@@ -22,10 +22,6 @@ public:
 	// max number that has sent
 	ssize_t maxMessageId;
 
-	//key has the following structure, linked with #
-	//ssize_t type;
-	//std::string processId;
-	//ssize_t messageId;
 
 	Message createMessage(ssize_t type, string processID, ssize_t messageID, string data);
 	Message createMessage(Message* m);
@@ -35,6 +31,8 @@ public:
 
 	ssize_t get_maxPSEQ();
 	ssize_t get_maxASEQ();
+	void set_maxPSEQ(ssize_t);
+	void set_maxASEQ(ssize_t);
 
 	bool existMessage(ssize_t type, string processID, ssize_t messageID);
 	bool existMessage(Message m);
@@ -58,6 +56,10 @@ public:
 	void sendDATA(string content);
 
 private:
+	//key has the following structure, linked with #
+	//ssize_t type;
+	//std::string processId;
+	//ssize_t messageId;
 	std::unordered_map<std::string,std::string> receivedMessages;
 	string getKey(ssize_t type, string pid, ssize_t mid);
 	void sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString);
