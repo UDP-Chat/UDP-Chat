@@ -23,7 +23,7 @@ Members::~Members() {
 void Members::parseNew(Message buffer){
 	// put into hold back queue
 	HoldBackQueueItem item;
-	int pseq = max(messageHistory->get_maxPSEQ(),messageHistory->get_maxASEQ())+1;
+	int pseq = max(messageStore->Messages::get_maxPSEQ(),messageStore->Messages::get_maxASEQ())+1;
 	item.Seq = pseq;
 	item.deliverable = false;
 	item.m = buffer;
