@@ -5,18 +5,18 @@
  *      Author: yuexi
  */
 
-#ifndef MESSAGES_H_
-#define MESSAGES_H_
+#ifndef MESSAGESTORE_H_
+#define MESSAGESTORE_H_
 
 #include "includeAll.h"
 #include <unordered_map>
 #include "message_format.h"
 #include <string>
 
-class Messages {
+class MessageStore {
 public:
-	Messages();
-	virtual ~Messages();
+	MessageStore();
+	virtual ~MessageStore();
 	sem_t lock;
 
 	// max number that has sent
@@ -64,4 +64,4 @@ private:
 	void sendFourway(ssize_t type, ssize_t messageID, string data, string printString);
 };
 
-#endif /* MESSAGES_H_ */
+#endif /* MESSAGESTORE_H_ */

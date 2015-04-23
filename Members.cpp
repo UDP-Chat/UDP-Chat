@@ -20,7 +20,7 @@ Members::~Members() {
 
 void Members::parseNEWorDATA(Message message){
 
-	int pseq = max(messageStore->Messages::get_maxPSEQ(),messageStore->Messages::get_maxASEQ())+1;
+	int pseq = max(messageStore->MessageStore::get_maxPSEQ(),messageStore->MessageStore::get_maxASEQ())+1;
 
 	if(messageStore->checkout(message)==false){
 		// put into hold back queue
