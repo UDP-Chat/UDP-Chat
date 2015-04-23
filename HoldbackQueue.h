@@ -18,8 +18,10 @@ public:
 	virtual ~HoldbackQueue();
 
 	std::vector<HoldBackQueueItem> queue;
+	//std::unordered_map<std::string,HoldBackQueueItem> queueMap;
 
 	void put(HoldBackQueueItem item);
+	void updateAseq(Message msg);
 private:
 	static bool compareSeq(const HoldBackQueueItem&,const HoldBackQueueItem&);
 	void findDeliverable();

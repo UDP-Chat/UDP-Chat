@@ -25,6 +25,12 @@ ssize_t MessageStore::get_maxPSEQ(){
 ssize_t MessageStore::get_maxASEQ(){
 	return maxASEQ;
 }
+void MessageStore::set_maxPSEQ(ssize_t n){
+	maxPSEQ = n;
+}
+void MessageStore::set_maxASEQ(ssize_t n){
+	maxASEQ = n;
+}
 
 Message MessageStore::createMessage(ssize_t type, string processID, ssize_t messageID, string data){
 	Message msg;
@@ -149,8 +155,6 @@ bool MessageStore::sendJOIN(string group_processId){
 
 void MessageStore::sendNEW(){
 	this->sendFourway(TYPE_NEW, MESSAGE_ID_NEW, udp->name, "   sending NEW to ");
-
-	//TODO finish up mark able to start etc think
 }
 
 

@@ -39,6 +39,7 @@ void HoldbackQueue::findDeliverable(){
 					string pid(msg.processId);
 
 					members->addMember(pid,name);
+					cout << "NOTICE " << name << " joined on " << pid << endl;
 				}
 				else{ // a chat message
 					string chat(msg.data);
@@ -51,4 +52,16 @@ void HoldbackQueue::findDeliverable(){
 				break;
 			}
 		}
+}
+
+void HoldbackQueue::updateAseq(Message msg){
+	for(int i;i<queue.size();i++){
+		Message2 mq = messageStore->convert_message_to_cpp(queue[i].m);
+		Message2 m = messageStore->convert_message_to_cpp(msg);
+		if(mq.processId.compare(m.processId)==0 && mq.messageId==m.messageId){
+			queue[i].Seq = atoi(msg.data);
+			break;
+		}
+	}
+	findDeliverable();
 }

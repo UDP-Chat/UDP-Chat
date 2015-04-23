@@ -31,6 +31,8 @@ public:
 
 	ssize_t get_maxPSEQ();
 	ssize_t get_maxASEQ();
+	void set_maxPSEQ(ssize_t);
+	void set_maxASEQ(ssize_t);
 
 	bool existMessage(ssize_t type, string processID, ssize_t messageID);
 	bool existMessage(Message m);

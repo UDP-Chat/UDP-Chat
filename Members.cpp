@@ -21,7 +21,7 @@ Members::~Members() {
 void Members::parseNEWorDATA(Message message){
 
 	int pseq = max(messageStore->MessageStore::get_maxPSEQ(),messageStore->MessageStore::get_maxASEQ())+1;
-
+	messageStore->set_maxPSEQ(pseq);
 	if(messageStore->checkout(message)==false){
 		// put into hold back queue
 		HoldBackQueueItem item;
@@ -102,10 +102,13 @@ void Members::reportDie(string pid){
 
 void Members::parseASEQ(Message msg){
 	if(messageStore->checkout(msg)==false){
-		//TODO
-		//update aseq
-		//deliever
-
+		// update aseq
+		ssize_t aseq = atoi(msg.data);
+		if(aseq > messageStore->get_maxASEQ()){
+			messageStore->set_maxASEQ(aseq);
+		}
+		// deliever
+		holdbackQueue->updateAseq(msg);
 	}
 
 	Message ack=messageStore->createMessage(TYPE_ACK, udp->processID, msg.messageId, "");
