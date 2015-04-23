@@ -27,7 +27,7 @@ typedef struct {
 } Message2;
 
 typedef struct{
-	Message m;
+	Message2 m;
 	bool deliverable;
 	ssize_t Seq;
 } HoldBackQueueItem;

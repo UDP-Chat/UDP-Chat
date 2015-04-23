@@ -43,7 +43,7 @@ public:
 	void putMessage(Message m);
 	void putMessage(Message2 m);
 
-	bool checkout(Message m);
+	bool checkout(Message2 m);
 	bool checkout(Message* m);
 
 	ssize_t maxPSEQ;

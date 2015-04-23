@@ -18,7 +18,7 @@ Members::Members() {
 Members::~Members() {
 }
 
-void Members::parseNEWorDATA(Message message){
+void Members::parseNEWorDATA(Message2 message){
 
 	int pseq = max(messageStore->MessageStore::get_maxPSEQ(),messageStore->MessageStore::get_maxASEQ())+1;
 	messageStore->set_maxPSEQ(pseq);
@@ -36,7 +36,7 @@ void Members::parseNEWorDATA(Message message){
 	udp->send_msg(message.processId,msg);
 }
 
-void Members::parseJOIN(Message message){
+void Members::parseJOIN(Message2 message){
 	// After received a Join message, should return a List message
 
 	string data;
@@ -54,7 +54,7 @@ void Members::parseJOIN(Message message){
 	udp->send_msg(message.processId,msg);
 }
 
-void Members::parseList(Message msg){
+void Members::parseList(Message2 msg){
 	std::vector<std::string> member;
 	string dataString(msg.data);
 	split(dataString,' ',member);
@@ -100,10 +100,10 @@ void Members::reportDie(string pid){
 }
 
 
-void Members::parseASEQ(Message msg){
+void Members::parseASEQ(Message2 msg){
 	if(messageStore->checkout(msg)==false){
 		// update aseq
-		ssize_t aseq = atoi(msg.data);
+		ssize_t aseq = atoi(msg.data.c_str());
 		if(aseq > messageStore->get_maxASEQ()){
 			messageStore->set_maxASEQ(aseq);
 		}

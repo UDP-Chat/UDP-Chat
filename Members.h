@@ -26,11 +26,11 @@ public:
 	// value is the last contact time
 	std::unordered_map<std::string,MemberInfo> memberList;
 
-	void parseJOIN(Message msg);
-	void parseList(Message msg);
-	void parseNEWorDATA(Message msg);
-	void parseASEQ(Message msg);
-	void parseDATA(Message msg);
+	void parseJOIN(Message2 msg);
+	void parseList(Message2 msg);
+	void parseNEWorDATA(Message2 msg);
+	void parseASEQ(Message2 msg);
+	void parseDATA(Message2 msg);
 
 	void split(const std::string &s, char delim, std::vector<std::string> &elems);
 	void addMember(string processid, string name);

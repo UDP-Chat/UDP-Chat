@@ -21,7 +21,7 @@ public:
 	//std::unordered_map<std::string,HoldBackQueueItem> queueMap;
 
 	void put(HoldBackQueueItem item);
-	void updateAseq(Message msg);
+	void updateAseq(Message2 msg);
 private:
 	static bool compareSeq(const HoldBackQueueItem&,const HoldBackQueueItem&);
 	void findDeliverable();

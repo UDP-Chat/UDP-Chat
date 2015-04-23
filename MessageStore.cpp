@@ -98,7 +98,7 @@ string MessageStore::getMessageData(ssize_t type, string processID, ssize_t mess
 }
 
 
-bool MessageStore::checkout(Message m){
+bool MessageStore::checkout(Message2 m){
 	if(this->existMessage(m)){
 		return true;
 	}else{
@@ -107,11 +107,10 @@ bool MessageStore::checkout(Message m){
 	}
 }
 bool MessageStore::checkout(Message* m){
-	return this->checkout(this->createMessage(m));
+	return this->checkout(this->convert_message_to_cpp(this->createMessage(m)));
 }
 
-void MessageStore::putMessage(Message m){
-	Message2 m2=this->convert_message_to_cpp(m);
+void MessageStore::putMessage(Message2 m2){
 	sem_wait(&lock);
 	pair<string, string> p(this->getKey(m2.type,m2.processId,m2.messageId),m2.data);
 	receivedMessages.insert(p);
