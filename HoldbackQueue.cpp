@@ -32,6 +32,17 @@ void HoldbackQueue::printQueue(){
 //		cout << "           Processid: " << queue[i].m.processId << " Messageid: " << queue[i].m.messageId <<endl;
 //	}
 }
+
+void HoldbackQueue::removeMessage(string processID, ssize_t messageID){
+	for(int i=0;i<holdbackQueue->queue.size();i++){
+		if(holdbackQueue->queue[i].m.processId.compare(processID)==0 && holdbackQueue->queue[i].m.messageId==messageID){
+			holdbackQueue->queue.erase(holdbackQueue->queue.begin()+i);
+			i--;
+		}
+	}
+
+}
+
 void HoldbackQueue::findDeliverable(){
 	// sort the queue to find any deliverable messages
 	std::sort(queue.begin(),queue.end(),HoldbackQueue::compareSeq);

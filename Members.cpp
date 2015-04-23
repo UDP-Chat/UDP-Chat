@@ -144,18 +144,21 @@ void Members::parseASEQ(Message2 msg){
 	messageStore->sendACK(msg.processId, ack);
 }
 
+
 void Members::parseLEAVE(Message2 msg){
 	cout << "NOTICE "+this->getName(msg.processId)+" on "+msg.processId+" left the chat group." << endl;
 
 
+	std::vector<Message2> list;
+	for(int i=0; i< holdbackQueue->queue.size();i++ ){
 
-	for each item in holdbackQueue{
-		Message pending =item.m;
-
-
+		Message2 pending =holdbackQueue->queue[i].m;
+		list.push_back(pending);
 	}
-
+	for(int i=0;i<list.size();i++){
+		list[i];
+	}
 	//TODO
 
-}
 
+}
