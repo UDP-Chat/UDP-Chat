@@ -32,6 +32,7 @@ public:
 	void parseASEQ(Message2 msg);
 	void parseDATA(Message2 msg);
 	void parseLEAVE(Message2 msg, bool lockmember, bool lockqueue);
+	void parseASKASEQ(Message2 m);
 
 	void split(const std::string &s, char delim, std::vector<std::string> &elems);
 	void addMember(string processid, string name, bool lock);
