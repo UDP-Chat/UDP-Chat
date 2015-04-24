@@ -24,7 +24,7 @@ void inputLoop(){
 
 	string input;
 	while(true){
-		cin >> input;
+		getline(cin,input);
 		if(cin.eof()){
 			cout << "Quitting chat..." << endl;
 			//TODO
