@@ -22,7 +22,6 @@ typedef struct {
 	string processId;
 	ssize_t messageId;
 	string data;
-	string key;
 } Message2;
 
 typedef struct{
