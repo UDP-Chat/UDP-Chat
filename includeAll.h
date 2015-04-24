@@ -30,10 +30,10 @@
 #define MESSAGE_ID_COMFIRMALIVE -6
 #define MESSAGE_ID_LEAVE -7
 
-#define MAX_TRAILS 13
+#define MAX_TRAILS 15
 
-#define RESEND_INTERVAL 500
-#define HEARTBEAT_ALIVE_TIMEOUT 8
+#define RESEND_INTERVAL 1000
+#define HEARTBEAT_ALIVE_TIMEOUT 60
 
 #include <thread>
 #include <iostream>

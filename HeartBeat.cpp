@@ -84,7 +84,7 @@ void HeartBeat::confirmBeat(string pid, bool lockMember){
 
 void HeartBeat::sendHeartBeat(bool lock){
 	while(true){
-		std::this_thread::sleep_for (std::chrono::seconds(1));
+		std::this_thread::sleep_for (std::chrono::seconds(5));
 		if(lock)members->lock_members();
 		for(auto it=members->memberList_locked.begin();it!=members->memberList_locked.end();++it){
 			string pid=(*it).first;
