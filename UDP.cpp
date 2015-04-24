@@ -118,8 +118,18 @@ int UDP::send_msg(string processID, Message message){
 int UDP::send_msg(string host_in, string port_in, Message msg_in){
 		if(encrypt){
 			string data=string(msg_in.data);
+
+			string temp=data;
+			cout<<"before encrypt: "+temp<<endl;
+
 			data=messageStore->encrypt(data, password);
 			memcpy(msg_in.data,data.c_str(),data.length()+1);
+
+			string temp2=messageStore->decrypt(string(msg_in.data), password);
+			cout<<"after encrypt: "+temp2<<endl;
+			bool same=temp.compare(temp2)==0;
+			string s=same?"t":"f";
+			cout<<"after encrypt: "+s<<endl;
 		}
 
 

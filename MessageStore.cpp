@@ -290,6 +290,7 @@ void MessageStore::sendASK_ASEQ(string processID, ssize_t messageID){
 	}
 
 	if(existMessage(expectedReply)==false){
+//		members->removeMember(processID);//TODO
 		holdbackQueue->removeMessage(processID, messageID);
 	}
 }
