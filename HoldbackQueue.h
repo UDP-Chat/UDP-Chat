@@ -16,16 +16,19 @@ class HoldbackQueue {
 public:
 	HoldbackQueue();
 	virtual ~HoldbackQueue();
+	sem_t lock_queue;
 
-	std::vector<HoldBackQueueItem> queue;
+	std::vector<HoldBackQueueItem> queue_locked;
 	//std::unordered_map<std::string,HoldBackQueueItem> queueMap;
 
-	void put(HoldBackQueueItem item);
-	void updateAseq(Message2 msg);
-	void removeMessage(string processID, ssize_t messageID);
+	void put(HoldBackQueueItem item, bool lock);
+	void updateAseq(Message2 msg, bool lock);
+	void removeMessage(string processID, ssize_t messageID, bool lock);
+	void lock();
+	void unlock();
 private:
 	static bool compareSeq(const HoldBackQueueItem&,const HoldBackQueueItem&);
-	void findDeliverable();
+	void findDeliverable(bool lock);
 	void printQueue();
 };
 

@@ -14,16 +14,24 @@ bool HoldbackQueue::compareSeq(const HoldBackQueueItem& item1,const HoldBackQueu
 }
 
 HoldbackQueue::HoldbackQueue() {
-	// TODO Auto-generated constructor stub
+	sem_init(&lock_queue, 0, 1);
 
 }
 
 HoldbackQueue::~HoldbackQueue() {
-	// TODO Auto-generated destructor stub
 }
 
-void HoldbackQueue::put(HoldBackQueueItem item){
-	this->queue.push_back(item);
+void HoldbackQueue::lock(){
+	sem_wait(&lock_queue);
+}
+void HoldbackQueue::unlock(){
+	sem_post(&lock_queue);
+}
+
+void HoldbackQueue::put(HoldBackQueueItem item, bool lock){
+	if(lock)this->lock();
+	this->queue_locked.push_back(item);
+	if(lock)this->unlock();
 }
 
 void HoldbackQueue::printQueue(){
@@ -33,33 +41,36 @@ void HoldbackQueue::printQueue(){
 //	}
 }
 
-void HoldbackQueue::removeMessage(string processID, ssize_t messageID){
-	for(int i=0;i<holdbackQueue->queue.size();i++){
-		if(holdbackQueue->queue[i].m.processId.compare(processID)==0 && holdbackQueue->queue[i].m.messageId==messageID){
-			holdbackQueue->queue.erase(holdbackQueue->queue.begin()+i);
+void HoldbackQueue::removeMessage(string processID, ssize_t messageID, bool lock){
+	if(lock)this->lock();
+	for(int i=0;i<this->queue_locked.size();i++){
+		if(this->queue_locked[i].m.processId.compare(processID)==0 && holdbackQueue->queue_locked[i].m.messageId==messageID){
+			this->queue_locked.erase(this->queue_locked.begin()+i);
 			i--;
 		}
 	}
+	if(lock)this->unlock();
 
 }
 
-void HoldbackQueue::findDeliverable(){
+void HoldbackQueue::findDeliverable(bool lock){
+	if(lock)this->lock();
 	// sort the queue to find any deliverable messages
-	std::sort(queue.begin(),queue.end(),HoldbackQueue::compareSeq);
+	std::sort(queue_locked.begin(),queue_locked.end(),HoldbackQueue::compareSeq);
 
 	//printQueue();
 	// find deliverable messages
-		for(int i=0;i<queue.size();i++){
-			if(queue[i].deliverable){
-				Message2 msg = queue[i].m;
-				if(queue[i].m.type==TYPE_NEW){ // add a new member
+		for(int i=0;i<queue_locked.size();i++){
+			if(queue_locked[i].deliverable){
+				Message2 msg = queue_locked[i].m;
+				if(queue_locked[i].m.type==TYPE_NEW){ // add a new member
 					string name=msg.data;
 					string pid=msg.processId;
 
 					if(pid.compare(udp->processID)==0){
 
 					}else{
-						members->addMember(pid,name);
+						members->addMember(pid,name, true);
 						cout << "NOTICE " << name << " joined on " << pid << endl;
 					}
 
@@ -69,33 +80,37 @@ void HoldbackQueue::findDeliverable(){
 					if(msg.processId.compare(udp->processID)==0){
 						name = udp->name;
 					}else{
-						name = members->getName(msg.processId);
+						name = members->getName(msg.processId, true);
 					}
 
 					string chat=msg.data;
 					cout << name << ":: " << chat << endl;
 				}
 				// delete the already delivered message
-				queue.erase(queue.begin()+i);
+				queue_locked.erase(queue_locked.begin()+i);
 				i--;
 			}else{
 				break;
 			}
 		}
+
+		if(lock)this->unlock();
 }
 
-void HoldbackQueue::updateAseq(Message2 msg){
+void HoldbackQueue::updateAseq(Message2 msg, bool lock){
 	printQueue();
-	for(int i=0; i<queue.size();i++){
-		Message2 mq = queue[i].m;
+	if(lock)this->lock();
+	for(int i=0; i<queue_locked.size();i++){
+		Message2 mq = queue_locked[i].m;
 //		cout << "Received Aseq: processId "<<msg.processId<<" messageId: "<<msg.messageId<<endl;
 
 		if(mq.processId.compare(msg.processId)==0 && mq.messageId==msg.messageId){
 //			cout << "Find the deliverable msg in holdback queue" << endl;
-			queue[i].Seq = atoi(msg.data.c_str());
-			queue[i].deliverable=true;
+			queue_locked[i].Seq = atoi(msg.data.c_str());
+			queue_locked[i].deliverable=true;
 			break;
 		}
 	}
-	findDeliverable();
+	if(lock)this->unlock();
+	findDeliverable(lock);
 }

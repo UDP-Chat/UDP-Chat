@@ -35,16 +35,23 @@ void Members::parseNEWorDATA(Message2 message){
 //		messageStore->updateMessageData(message.type, message.processId, message.messageId, to_string(pseq));
 		Message2 update=message;
 		update.data=to_string(pseq);
-		messageStore->putMessage(update);
+		messageStore->putMessage(update,true);
 
-		holdbackQueue->put(item);
+		holdbackQueue->put(item, true);
 	}else{
-		pseq=atoi(messageStore->getMessageData(message.type, message.processId, message.messageId).c_str());
+		pseq=atoi(messageStore->getMessageData(message.type, message.processId, message.messageId, true).c_str());
 	}
 
 	// send PSEQ
 	Message msg=messageStore->createMessage(TYPE_PSEQ, udp->processID, message.messageId, to_string(pseq));
 	udp->send_msg(message.processId,msg);
+}
+
+void Members::lock_members(){
+	sem_wait(&lock_memberList);
+}
+void Members::unlock_members(){
+	sem_post(&lock_memberList);
 }
 
 void Members::parseJOIN(Message2 message){
@@ -55,9 +62,11 @@ void Members::parseJOIN(Message2 message){
 	data = udp->processID + "#" + udp->name;
 
 	// add other members into the list
-	for(auto it=memberList.begin();it!=memberList.end();++it){
+	lock_members();
+	for(auto it=memberList_locked.begin();it!=memberList_locked.end();++it){
 		data = data + " " + (*it).first+"#"+(*it).second.name;
 	}
+	unlock_members();
 
 	Message msg=messageStore->createMessage(TYPE_LIST, udp->processID, MESSAGE_ID_LIST, data);
 
@@ -71,6 +80,7 @@ void Members::parseList(Message2 msg){
 	split(dataString,' ',member);
 	time_t t = time(0);
 
+	lock_members();
 	// copy the member list into its own memberList unordered_map
 	for(std::vector<std::string>::iterator it = member.begin();it!=member.end();++it){
 		MemberInfo mi;
@@ -78,8 +88,9 @@ void Members::parseList(Message2 msg){
 		mi.time=(long)t;
 		string ipport=(*it).substr(0,(*it).find('#'));
 		pair<std::string,MemberInfo> ele(ipport,mi);
-		memberList.insert(ele);
+		memberList_locked.insert(ele);
 	}
+	unlock_members();
 
 	messageStore->sendNEW();
 
@@ -98,26 +109,30 @@ void Members::split(const std::string &s, char delim, std::vector<std::string> &
 }
 
 
-void Members::addMember(string processid, string name){
+void Members::addMember(string processid, string name, bool lock){
+	if(lock)lock_members();
 	MemberInfo mi;
 	time_t t = time(0);
 	mi.name = name;
 	mi.time = (long)t;
 	pair<std::string,MemberInfo> newPair(processid,mi);
-	this->memberList.insert(newPair);
+	this->memberList_locked.insert(newPair);
+	if(lock)unlock_members();
 }
 
-void Members::printMemberList(){
-	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+void Members::printMemberList(bool lock){
+	if(lock)lock_members();
+	for(auto it=members->memberList_locked.begin();it!=members->memberList_locked.end();++it){
 					cout << (*it).second.name << " " << (*it).first<<endl;
 			}
+	if(lock)unlock_members();
 }
 
-void Members::reportNoResponse(string pid){
+void Members::reportNoResponse(string pid, bool lock){
 //	cout<<"REPORTING LEAVE "+pid<<endl;
 
 	//send report to others
-	std::thread t(&MessageStore::sendLEAVE, messageStore, pid);
+	std::thread t(&MessageStore::sendLEAVE, messageStore, pid, lock);
 	t.detach();
 
 	//send report to self
@@ -127,12 +142,17 @@ void Members::reportNoResponse(string pid){
 //	t2.detach();
 }
 
-string Members::getName(string pid){
-	if(memberList.count(pid)>0){
-		return memberList.find(pid)->second.name;
+string Members::getName(string pid, bool lock){
+	if(lock)lock_members();
+	string res;
+	if(memberList_locked.count(pid)>0){
+		res= memberList_locked.find(pid)->second.name;
 	}else{
-		return pid;
+		res= pid;
 	}
+	if(lock)unlock_members();
+	return res;
+
 }
 
 void Members::parseASEQ(Message2 msg){
@@ -143,7 +163,7 @@ void Members::parseASEQ(Message2 msg){
 			messageStore->set_maxASEQ(aseq);
 		}
 		// deliever
-		holdbackQueue->updateAseq(msg);
+		holdbackQueue->updateAseq(msg, true);
 	}
 
 	Message ack=messageStore->createMessage(TYPE_ACK, udp->processID, msg.messageId, "");
@@ -151,24 +171,28 @@ void Members::parseASEQ(Message2 msg){
 }
 
 
-void Members::parseLEAVE(Message2 msg){
+void Members::parseLEAVE(Message2 msg, bool lockmember, bool lockqueue){
 
-	if(members->memberList.count(msg.processId)>0){
-		cout << "NOTICE "+this->getName(msg.processId)+" on "+msg.processId+" left the chat group." << endl;
+	if(lockmember)lock_members();
+	if(members->memberList_locked.count(msg.processId)>0){
+		cout << "NOTICE "+this->getName(msg.processId, false)+" on "+msg.processId+" left the chat group." << endl;
 
 		//		members->removeMember(processID);
-		members->memberList.erase(members->memberList.find(msg.processId));
+		members->memberList_locked.erase(members->memberList_locked.find(msg.processId));
 	}
+	if(lockmember)unlock_members();
 
+	if(lockqueue)holdbackQueue->lock();
 	std::vector<Message2> list;
-	for(int i=0; i< holdbackQueue->queue.size();i++ ){
-		Message2 pending =holdbackQueue->queue[i].m;
+	for(int i=0; i< holdbackQueue->queue_locked.size();i++ ){
+		Message2 pending =holdbackQueue->queue_locked[i].m;
 		list.push_back(pending);
 	}
+	if(lockqueue)holdbackQueue->unlock();
 
 	for(int i=0;i<list.size();i++){
 		Message2 m=list[i];
-		std::thread t(&MessageStore::sendASK_ASEQ, messageStore, m.processId, m.messageId);
+		std::thread t(&MessageStore::sendASK_ASEQ, messageStore, m.processId, m.messageId, lockmember);
 		t.detach();
 	}
 

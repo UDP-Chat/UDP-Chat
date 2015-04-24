@@ -16,14 +16,14 @@ public:
 	HeartBeat();
 	virtual ~HeartBeat();
 
-	void parseMessage(Message2 message);
+	void parseMessage(Message2 message, bool lock);
 
 	void startMonitor();
 
 private:
-	void checkAlive();
-	void sendHeartBeat();
-	void confirmBeat(string pid);
+	void checkAlive(bool lock);
+	void sendHeartBeat(bool lock);
+	void confirmBeat(string pid, bool lock);
 };
 
 #endif /* HEARTBEAT_H_ */

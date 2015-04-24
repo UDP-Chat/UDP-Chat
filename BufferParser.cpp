@@ -21,7 +21,7 @@ void BufferParser::parse_buffer(Message* message){
 	Message m=messageStore->createMessage(message);
 	Message2 m2=messageStore->convert_message_to_cpp(m);
 
-	heartBeat->parseMessage(m2);
+	heartBeat->parseMessage(m2, true);
 
 //	cout << "   received message from "+messageStore->to_string(m2)<< endl;
 
@@ -53,7 +53,7 @@ void BufferParser::parse_buffer(Message* message){
 		if(messageStore->checkout(m2))return;
 
 //		cout << "received leave" <<endl;
-		members->parseLEAVE(m2);
+		members->parseLEAVE(m2, true, true);
 		break;
 	case TYPE_HEARTBEAT://finished.
 		break;

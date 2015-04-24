@@ -35,16 +35,16 @@ public:
 	void set_maxPSEQ(ssize_t);
 	void set_maxASEQ(ssize_t);
 
-	bool existMessage(ssize_t type, string processID, ssize_t messageID);
-	bool existMessage(Message m);
-	bool existMessage(Message2 m);
-	void removeMessage(Message m);
+	bool existMessage(ssize_t type, string processID, ssize_t messageID, bool lock);
+	bool existMessage(Message m, bool lock);
+	bool existMessage(Message2 m, bool lock);
+	void removeMessage(Message m, bool lock);
 
-	string getMessageData(ssize_t type, string processID, ssize_t messageID);
-	string updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data);
+	string getMessageData(ssize_t type, string processID, ssize_t messageID, bool lock);
+	string updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data, bool lock);
 
-	void putMessage(Message m);
-	void putMessage(Message2 m);
+	void putMessage(Message m, bool lock);
+	void putMessage(Message2 m, bool lock);
 
 	bool checkout(Message2 m);
 	bool checkout(Message* m);
@@ -53,17 +53,20 @@ public:
 
 	bool sendJOIN(string group_processId);
 	void sendNEW();
-	void sendASEQ(ssize_t messageID, int maxASEQ);
+	void sendASEQ(ssize_t messageID, int maxASEQ, bool lock);
 	void sendACK(string processID, Message m);
 	void sendDATA(string content);
 	string to_string(Message2 m2);
-	void sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString, bool reportNoResponse);
-	void sendLEAVE(string processID);
+	void sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString, bool reportNoResponse, bool lockMember);
+	void sendLEAVE(string processID, bool lock);
 
-	void sendASK_ASEQ(string processID, ssize_t messageID);
+	void sendASK_ASEQ(string processID, ssize_t messageID, bool lock);
 
 	string encrypt(std::string);
 	string decrypt(std::string);
+
+	void lock_received();
+	void unlock_received();
 
 private:
 	// max number that has sent
@@ -76,9 +79,9 @@ private:
 	//ssize_t type;
 	//std::string processId;
 	//ssize_t messageId;
-	std::unordered_map<std::string,std::string> receivedMessages;
+	std::unordered_map<std::string,std::string> receivedMessages_locked;
 	string getKey(ssize_t type, string pid, ssize_t mid);
-	void sendFourway(ssize_t type, ssize_t messageID, string data, string printString);
+	void sendFourway(ssize_t type, ssize_t messageID, string data, string printString, bool lock);
 };
 
 #endif /* MESSAGESTORE_H_ */

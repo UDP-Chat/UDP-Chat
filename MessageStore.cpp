@@ -76,62 +76,66 @@ Message2 MessageStore::convert_message_to_cpp(Message m){
 	return res;
 }
 
-void MessageStore::removeMessage(Message m){
-	sem_wait(&lock_receivedMessages);
+void MessageStore::removeMessage(Message m, bool lock){
+	if(lock)sem_wait(&lock_receivedMessages);
 	Message2 m2=this->convert_message_to_cpp(m);
-	if(receivedMessages.count(this->getKey(m2.type,m2.processId,m2.messageId))>0){
-		this->receivedMessages.erase(getKey(m2.type,m2.processId,m2.messageId));
+	if(receivedMessages_locked.count(this->getKey(m2.type,m2.processId,m2.messageId))>0){
+		this->receivedMessages_locked.erase(getKey(m2.type,m2.processId,m2.messageId));
 	}
-	sem_post(&lock_receivedMessages);
+	if(lock)sem_post(&lock_receivedMessages);
 }
 
-bool MessageStore::existMessage(Message m){
-	return this->existMessage(this->convert_message_to_cpp(m));
+bool MessageStore::existMessage(Message m, bool lock){
+	return this->existMessage(this->convert_message_to_cpp(m), lock);
 }
 
-bool MessageStore::existMessage(Message2 m){
-	return this->existMessage(m.type, m.processId, m.messageId);
+bool MessageStore::existMessage(Message2 m, bool lock){
+	return this->existMessage(m.type, m.processId, m.messageId, lock);
 }
 
 
-bool MessageStore::existMessage(ssize_t type, string processID, ssize_t messageID){
-	sem_wait(&lock_receivedMessages);
-	bool res=receivedMessages.count(this->getKey(type,processID,messageID))>0;
-	sem_post(&lock_receivedMessages);
+bool MessageStore::existMessage(ssize_t type, string processID, ssize_t messageID, bool lock){
+	if(lock)sem_wait(&lock_receivedMessages);
+	bool res=receivedMessages_locked.count(this->getKey(type,processID,messageID))>0;
+	if(lock)sem_post(&lock_receivedMessages);
 	return res;
 }
 
-string MessageStore::getMessageData(ssize_t type, string processID, ssize_t messageID){
-	sem_wait(&lock_receivedMessages);
-	string res=receivedMessages.find(this->getKey(type,processID,messageID))->second;
-	sem_post(&lock_receivedMessages);
+string MessageStore::getMessageData(ssize_t type, string processID, ssize_t messageID, bool lock){
+	if(lock)sem_wait(&lock_receivedMessages);
+	string res=receivedMessages_locked.find(this->getKey(type,processID,messageID))->second;
+	if(lock)sem_post(&lock_receivedMessages);
 	return res;
 }
 
-string MessageStore::updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data){
-	sem_wait(&lock_receivedMessages);
-	receivedMessages.find(this->getKey(type,processID,messageID))->second=new_data;
-	sem_post(&lock_receivedMessages);
+string MessageStore::updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data, bool lock){
+	if(lock)sem_wait(&lock_receivedMessages);
+	receivedMessages_locked.find(this->getKey(type,processID,messageID))->second=new_data;
+	if(lock)sem_post(&lock_receivedMessages);
 }
 
 
 bool MessageStore::checkout(Message2 m){
-	if(this->existMessage(m)){
-		return true;
+	bool res;
+	sem_wait(&lock_receivedMessages);
+	if(this->existMessage(m, false)){
+		res=true;
 	}else{
-		this->putMessage(m);
-		return false;
+		this->putMessage(m, false);
+		res=false;
 	}
+	sem_post(&lock_receivedMessages);
+	return res;
 }
 bool MessageStore::checkout(Message* m){
 	return this->checkout(this->convert_message_to_cpp(this->createMessage(m)));
 }
 
-void MessageStore::putMessage(Message2 m2){
-	sem_wait(&lock_receivedMessages);
+void MessageStore::putMessage(Message2 m2, bool lock){
+	if(lock)sem_wait(&lock_receivedMessages);
 	pair<string, string> p(this->getKey(m2.type,m2.processId,m2.messageId),m2.data);
-	receivedMessages.insert(p);
-	sem_post(&lock_receivedMessages);
+	receivedMessages_locked.insert(p);
+	if(lock)sem_post(&lock_receivedMessages);
 }
 
 
@@ -154,14 +158,14 @@ bool MessageStore::sendJOIN(string group_processId){
 
 	int trials=0;
 
-	while(this->existMessage(expectedReturn)==false && trials<MAX_TRAILS){
+	while(this->existMessage(expectedReturn,true)==false && trials<MAX_TRAILS){
 //		cout << "   sending JOIN..." << endl;
 		udp->send_msg(group_processId,msg);
 		trials++;
 		std::this_thread::sleep_for (std::chrono::milliseconds(RESEND_INTERVAL));
 	}
 
-	if(this->existMessage(expectedReturn)){
+	if(this->existMessage(expectedReturn, true)){
 		return true;
 	}else{
 		return false;
@@ -170,12 +174,15 @@ bool MessageStore::sendJOIN(string group_processId){
 
 
 void MessageStore::sendNEW(){
-	this->sendFourway(TYPE_NEW, MESSAGE_ID_NEW, udp->name, "   sending NEW to ");
+	this->sendFourway(TYPE_NEW, MESSAGE_ID_NEW, udp->name, "   sending NEW to ", true);
 }
 
 
-void MessageStore::sendASEQ(ssize_t messageID, int aseq){
-	int n=members->memberList.size();
+void MessageStore::sendASEQ(ssize_t messageID, int aseq, bool memberlock){
+
+	if(memberlock)members->lock_members();
+	int n=members->memberList_locked.size();
+	if(memberlock)members->unlock_members();
 	thread threads[n];
 
 	int i=0;
@@ -184,27 +191,29 @@ void MessageStore::sendASEQ(ssize_t messageID, int aseq){
 	Message msg=this->createMessage(TYPE_ASEQ, udp->processID, messageID, std::to_string(aseq));
 
 	// send ASEQ message to all the members in the group
-	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+	if(memberlock)members->lock_members();
+	for(auto it=members->memberList_locked.begin();it!=members->memberList_locked.end();++it){
 		string pid=(*it).first;
 		Message expectedReply=createMessage(TYPE_ACK, pid, messageID,"");
-		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, "   sending ASEQ to "+pid+" ...", true);
+		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, "   sending ASEQ to "+pid+" ...", true, memberlock);
 		i++;
 	}
+	if(memberlock)members->unlock_members();
 
 	for(int j=0; j<i;j++){
 		threads[j].join();
 	}
 
 	//mark deliverable
-	holdbackQueue->updateAseq(convert_message_to_cpp(msg));
+	holdbackQueue->updateAseq(convert_message_to_cpp(msg), true);
 }
 
 
-void MessageStore::sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString, bool reportNoResponse){
+void MessageStore::sendMessageTimeoutTo(string processID, Message message, Message expectedReply, string printString, bool reportNoResponse, bool lockMember){
 	int trials=0;
 
 
-	while(this->existMessage(expectedReply)==false && trials<MAX_TRAILS){
+	while(this->existMessage(expectedReply, true)==false && trials<MAX_TRAILS){
 //		cout << printString + " Message: "+this->to_string(this->convert_message_to_cpp(message))<< endl;
 		udp->send_msg(processID,message);
 		trials++;
@@ -212,8 +221,8 @@ void MessageStore::sendMessageTimeoutTo(string processID, Message message, Messa
 	}
 
 
-	if(this->existMessage(expectedReply)==false && reportNoResponse){
-		members->reportNoResponse(processID);
+	if(this->existMessage(expectedReply, true)==false && reportNoResponse){
+		members->reportNoResponse(processID, lockMember);
 	}
 }
 
@@ -227,36 +236,45 @@ void MessageStore::sendDATA(string content){
 	int mid=maxMessageId;
 	maxMessageId++;
 
-	this->sendFourway(TYPE_DATA, mid, content, "   sending Chat DATA to ");
+	this->sendFourway(TYPE_DATA, mid, content, "   sending Chat DATA to ", true);
 }
 
-void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, string printString){
-	int n=members->memberList.size();
+void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, string printString, bool lock){
+
+	if(lock)members->lock_members();
+	int n=members->memberList_locked.size();
+	if(lock)members->unlock_members();
 	thread threads[n];
+
 
 
 	Message msg=this->createMessage(type, udp->processID, messageID, data);
 
+
+	sem_wait(&lock_receivedMessages);
 	//put into its own queu
-	if(this->existMessage(msg)==false){
+	if(this->existMessage(msg, false)==false){
 		HoldBackQueueItem item;
 		item.Seq = this->get_maxPSEQ();
 		item.deliverable = false;
 		item.m = this->convert_message_to_cpp(msg);
-	    holdbackQueue->put(item);
-	    this->putMessage(item.m);
+	    holdbackQueue->put(item, true);
+	    this->putMessage(item.m, false);
 	}
-
+	sem_post(&lock_receivedMessages);
 
 
 	int i=0;
 	// send DATA message to all the members in the group
-	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+
+	if(lock)members->lock_members();
+	for(auto it=members->memberList_locked.begin();it!=members->memberList_locked.end();++it){
 		string pid=(*it).first;
 		Message expectedReply=createMessage(TYPE_PSEQ, pid, messageID,"");
-		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, printString+pid+" ...", true);
+		threads[i]=std::thread(&MessageStore::sendMessageTimeoutTo, this, pid, msg, expectedReply, printString+pid+" ...", true, lock);
 		i++;
 	}
+	if(lock)members->unlock_members();
 
 	for(int j=0; j<i;j++){
 		threads[j].join();
@@ -265,43 +283,60 @@ void MessageStore::sendFourway(ssize_t type, ssize_t messageID, string data, str
 
 	//get max PSEQ from members, and prepare to send ASEQ
 	int maxPSEQ=-1;
-	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+	if(lock)members->lock_members();
+	for(auto it=members->memberList_locked.begin();it!=members->memberList_locked.end();++it){
 		string pid=(*it).first;
-		if(messageStore->existMessage(TYPE_PSEQ, pid, messageID)){//if left ignore
-			int pseq=atoi(messageStore->getMessageData(TYPE_PSEQ, pid, messageID).c_str());
+		sem_post(&lock_receivedMessages);
+		if(messageStore->existMessage(TYPE_PSEQ, pid, messageID, false)){//if left ignore
+			int pseq=atoi(messageStore->getMessageData(TYPE_PSEQ, pid, messageID, false).c_str());
 			if(pseq>maxPSEQ)maxPSEQ=pseq;
 		}
+		sem_post(&lock_receivedMessages);
 	}
+	if(lock)members->unlock_members();
 
 	if(maxPSEQ > messageStore->get_maxASEQ()){
 		messageStore->set_maxASEQ(maxPSEQ);
 	}
 
-	messageStore->sendASEQ(messageID, maxPSEQ);
+	messageStore->sendASEQ(messageID, maxPSEQ, true);
 }
 
-void MessageStore::sendLEAVE(string pid){
+void MessageStore::sendLEAVE(string pid, bool lock){
 	Message leave=messageStore->createMessage(TYPE_LEAVE, pid, MESSAGE_ID_LEAVE,"");
-	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+	if(lock)members->lock_members();
+	for(auto it=members->memberList_locked.begin();it!=members->memberList_locked.end();++it){
 		string pid=(*it).first;
 		udp->send_msg(pid, leave);
 	}
+	if(lock)members->unlock_members();
 }
 
 
-void MessageStore::sendASK_ASEQ(string processID, ssize_t messageID){
+void MessageStore::sendASK_ASEQ(string processID, ssize_t messageID, bool lockMember){
 	Message ask=createMessage(TYPE_ASK_ASEQ, udp->processID, messageID, processID);
 	Message expectedReply=createMessage(TYPE_ASEQ, processID, messageID,"");
-	for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
-		string pid=(*it).first;
-		this->sendMessageTimeoutTo(pid, ask, expectedReply, "   sending ASEQ to "+pid+" ...", false);
-	}
 
-	if(existMessage(expectedReply)==false){
-		holdbackQueue->removeMessage(processID, messageID);
+	if(lockMember)members->lock_members();
+	for(auto it=members->memberList_locked.begin();it!=members->memberList_locked.end();++it){
+		string pid=(*it).first;
+		messageStore->lock_received();
+		this->sendMessageTimeoutTo(pid, ask, expectedReply, "   sending ASEQ to "+pid+" ...", false, lockMember);
+	}
+	if(lockMember)members->unlock_members();
+
+	if(existMessage(expectedReply, true)==false){
+		holdbackQueue->removeMessage(processID, messageID, true);
 	}
 }
 
+
+void MessageStore::lock_received(){
+	sem_wait(&lock_receivedMessages);
+}
+void MessageStore::unlock_received(){
+	sem_post(&lock_receivedMessages);
+}
 
 string MessageStore::to_string(Message2 m2){
 	string type;

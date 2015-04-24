@@ -27,7 +27,7 @@ void inputLoop(){
 		getline(cin,input);
 		if(cin.eof()){
 			cout << "Quitting chat..." << endl;
-			messageStore->sendLEAVE(udp->processID);
+			messageStore->sendLEAVE(udp->processID, true);
 			exit(0);
 			break;
 		}else{
@@ -74,11 +74,15 @@ void start_as_guest(string group_address){
 			<<", listening on " << udp->processID << endl;
 
 	// print out current user list
+
 	if(messageStore->sendJOIN(group_address)){
 		cout << "Got list. current users:" << endl;
-		for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
+		members->lock_members();
+		for(auto it=members->memberList_locked.begin();it!=members->memberList_locked.end();++it){
 				cout << (*it).second.name << " " << (*it).first<<endl;
 		}
+		members->unlock_members();
+
 	}else{
 		cout << "Sorry, no chat is active on " << group_address<< ", try again later. Bye." << endl;
 		exit (EXIT_FAILURE);
