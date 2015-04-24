@@ -77,7 +77,7 @@ void HeartBeat::confirmBeat(string pid){
 
 void HeartBeat::sendHeartBeat(){
 	while(true){
-		std::this_thread::sleep_for (std::chrono::seconds(5));
+		std::this_thread::sleep_for (std::chrono::seconds(1));
 		for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
 			string pid=(*it).first;
 			Message beat=messageStore->createMessage(TYPE_HEARTBEAT, udp->processID, MESSAGE_ID_HEARTBEAT, "");

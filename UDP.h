@@ -31,7 +31,7 @@
 
 class UDP {
 public:
-	bool encrypt=true;
+	bool encrypt=false;
 	string password="cis505";
 
 	bool started;
