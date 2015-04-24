@@ -33,7 +33,7 @@
 #define MAX_TRAILS 13
 
 #define RESEND_INTERVAL 500
-#define HEARTBEAT_ALIVE_TIMEOUT 5
+#define HEARTBEAT_ALIVE_TIMEOUT 8
 
 #include <thread>
 #include <iostream>
