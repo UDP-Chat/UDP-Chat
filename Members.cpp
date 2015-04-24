@@ -10,6 +10,8 @@
 #include <sstream>
 #include <ctime>
 #include <unordered_map>
+#include <semaphore.h>
+#include <vector>
 
 Members::Members() {
 	sem_init(&lock_memberList, 0, 1);
