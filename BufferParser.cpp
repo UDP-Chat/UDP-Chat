@@ -61,6 +61,9 @@ void BufferParser::parse_buffer(Message* message){
 		break;
 	case TYPE_COMFIRMALIVE://finished.
 		break;
+	case TYPE_ASK_ASEQ:
+		members->parseASKASEQ(m2);
+		break;
 	default:
 		break;
 	}

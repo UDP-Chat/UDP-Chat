@@ -197,3 +197,11 @@ void Members::parseLEAVE(Message2 msg, bool lockmember, bool lockqueue){
 	}
 
 }
+
+void Members::parseASKASEQ(Message2 m){
+	Message toFind=messageStore->createMessage(TYPE_ASEQ, m.data, m.messageId, "");
+	if(messageStore->existMessage(toFind, true)){
+		toFind.data=messageStore->getMessageData(TYPE_ASEQ, m.data, m.messageId, true);
+		udp->send_msg(m.processId, toFind);
+	}
+}
