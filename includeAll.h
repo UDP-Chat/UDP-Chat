@@ -31,7 +31,7 @@
 #define MESSAGE_ID_LEAVE -7
 
 #define MAX_TRAILS 13
-#define RESEND_INTERVAL 300
+#define RESEND_INTERVAL 100000
 #define HEARTBEAT_ALIVE_TIMEOUT 15
 
 #include <thread>

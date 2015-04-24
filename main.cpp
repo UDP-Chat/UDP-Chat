@@ -27,7 +27,7 @@ void inputLoop(){
 		getline(cin,input);
 		if(cin.eof()){
 			cout << "Quitting chat..." << endl;
-			//TODO
+			messageStore->sendLEAVE(udp->processID);
 
 			break;
 		}else{
