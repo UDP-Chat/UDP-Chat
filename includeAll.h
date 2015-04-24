@@ -31,8 +31,8 @@
 #define MESSAGE_ID_LEAVE -7
 
 #define MAX_TRAILS 13
-#define RESEND_INTERVAL 100000
-#define HEARTBEAT_ALIVE_TIMEOUT 15
+#define RESEND_INTERVAL 500
+#define HEARTBEAT_ALIVE_TIMEOUT 5
 
 #include <thread>
 #include <iostream>
@@ -47,6 +47,10 @@ using namespace std;
 #include "MessageStore.h"
 #include "UDP.h"
 #include "BufferParser.h"
+
+#define ROTATE 100
+#define ASCII 126
+#define START 32
 
 
 #endif /* INCLUDEALL_H_ */

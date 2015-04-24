@@ -76,6 +76,14 @@ Message2 MessageStore::convert_message_to_cpp(Message m){
 	return res;
 }
 
+void MessageStore::removeMessage(Message m){
+	sem_wait(&lock_receivedMessages);
+	Message2 m2=this->convert_message_to_cpp(m);
+	if(receivedMessages.count(this->getKey(m2.type,m2.processId,m2.messageId))>0){
+		this->receivedMessages.erase(getKey(m2.type,m2.processId,m2.messageId));
+	}
+	sem_post(&lock_receivedMessages);
+}
 
 bool MessageStore::existMessage(Message m){
 	return this->existMessage(this->convert_message_to_cpp(m));
@@ -204,7 +212,7 @@ void MessageStore::sendMessageTimeoutTo(string processID, Message message, Messa
 	}
 
 
-	if(this->existMessage(expectedReply)==false){
+	if(this->existMessage(expectedReply)==false && reportNoResponse){
 		members->reportNoResponse(processID);
 	}
 }
@@ -290,8 +298,6 @@ void MessageStore::sendASK_ASEQ(string processID, ssize_t messageID){
 	}
 
 	if(existMessage(expectedReply)==false){
-//		members->removeMember(processID);
-		members->memberList.erase(members->memberList.find(processID));
 		holdbackQueue->removeMessage(processID, messageID);
 	}
 }
@@ -325,29 +331,45 @@ string MessageStore::to_string(Message2 m2){
 		type="PSEQ";
 		break;
 	default:
-		type="?";
+		type=std::to_string(m2.type);
 		break;
 	}
 	return m2.processId + " type: "+type+" mid: "+std::to_string(m2.messageId)+" content: "+m2.data;
 }
 
 
-/* Encryption referenced from http://www.cplusplus.com/forum/windows/128374/ */
-std::string MessageStore::encrypt(std::string msg, std::string const& key)
-{
-    // Side effects if the following is not written:
-    // In my case, division by 0.
-    // In the other case, stuck in an infinite loop.
-    if(!key.size())
-        return msg;
+string MessageStore::encrypt(string input){
+	char *cstr = new char[input.length() + 1];
+	size_t len = input.copy(cstr, input.length(),0);
+	cstr[len] = '\0';
 
-    for (std::string::size_type i = 0; i < msg.size(); ++i)
-        msg[i] ^= key[i%key.size()];
-    return msg;
+	for(int i=0;i<input.length();i++){
+		if(cstr[i]+ROTATE>=ASCII){
+			cstr[i]=(char)(cstr[i]+ROTATE-ASCII+START);
+		}
+		else
+			cstr[i]=(char)(cstr[i]+ROTATE);
+	}
+	string res(cstr);
+	delete [] cstr;
+	return res;
 }
 
-// Rewritten to use const& on both parameters
-std::string MessageStore::decrypt(std::string msg, std::string const& key)
-{
-    return encrypt(msg, key); // lol
+string MessageStore::decrypt(string input){
+	char *cstr = new char[input.length() + 1];
+	size_t len = input.copy(cstr, input.length(),0);
+	cstr[len] = '\0';
+
+	for(int i=0;i<input.length();i++){
+		if(cstr[i]-ROTATE<=START){
+			cstr[i]=(char)(cstr[i]-ROTATE+ASCII-START);
+		}
+		else
+			cstr[i]=(char)(cstr[i]-ROTATE);
+	}
+
+
+	string res(cstr);
+	delete [] cstr;
+	return res;
 }
