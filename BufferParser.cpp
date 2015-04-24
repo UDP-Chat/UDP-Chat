@@ -9,12 +9,10 @@
 #include "global.h"
 
 BufferParser::BufferParser() {
-	// TODO Auto-generated constructor stub
 
 }
 
 BufferParser::~BufferParser() {
-	// TODO Auto-generated destructor stub
 }
 
 
@@ -51,7 +49,10 @@ void BufferParser::parse_buffer(Message* message){
 		members->parseList(m2);
 		break;
 	case TYPE_LEAVE:
+//cout << "received leave" <<endl;
 		if(messageStore->checkout(m2))return;
+
+//		cout << "received leave" <<endl;
 		members->parseLEAVE(m2);
 		break;
 	case TYPE_HEARTBEAT://finished.

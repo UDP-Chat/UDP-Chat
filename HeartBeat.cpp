@@ -48,6 +48,9 @@ void HeartBeat::checkAlive(){
 	while(true){
 		std::this_thread::sleep_for (std::chrono::seconds(HEARTBEAT_ALIVE_TIMEOUT));
 		long now = (long)time(0);
+
+//		cout << "beat: members " << members->memberList.size()<<endl;
+
 		for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
 			long lasttime=(*it).second.time;
 
@@ -65,12 +68,16 @@ void HeartBeat::checkAlive(){
 void HeartBeat::confirmBeat(string pid){
 	Message message=messageStore->createMessage(TYPE_CHECKALIVE , pid, MESSAGE_ID_CHECKALIVE, "");
 	Message expectedReply=messageStore->createMessage(TYPE_COMFIRMALIVE, pid, MESSAGE_ID_COMFIRMALIVE, "");
+	if(messageStore->existMessage(expectedReply)){
+		messageStore->removeMessage(expectedReply);
+	}
 	messageStore->sendMessageTimeoutTo(pid, message, expectedReply, "   confirming alive with "+pid, true);
+
 }
 
 void HeartBeat::sendHeartBeat(){
 	while(true){
-		std::this_thread::sleep_for (std::chrono::seconds(5));
+		std::this_thread::sleep_for (std::chrono::seconds(1));
 		for(auto it=members->memberList.begin();it!=members->memberList.end();++it){
 			string pid=(*it).first;
 			Message beat=messageStore->createMessage(TYPE_HEARTBEAT, udp->processID, MESSAGE_ID_HEARTBEAT, "");

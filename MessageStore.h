@@ -38,6 +38,7 @@ public:
 	bool existMessage(ssize_t type, string processID, ssize_t messageID);
 	bool existMessage(Message m);
 	bool existMessage(Message2 m);
+	void removeMessage(Message m);
 
 	string getMessageData(ssize_t type, string processID, ssize_t messageID);
 	string updateMessageData(ssize_t type, string processID, ssize_t messageID, string new_data);
@@ -61,8 +62,8 @@ public:
 
 	void sendASK_ASEQ(string processID, ssize_t messageID);
 
-	std::string encrypt(std::string, std::string const& key);
-	std::string decrypt(std::string, std::string const& key);
+	string encrypt(std::string);
+	string decrypt(std::string);
 
 private:
 	// max number that has sent

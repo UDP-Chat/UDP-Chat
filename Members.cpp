@@ -114,7 +114,7 @@ void Members::printMemberList(){
 }
 
 void Members::reportNoResponse(string pid){
-	cout<<"REPORTING LEAVE"<<endl;
+//	cout<<"REPORTING LEAVE "+pid<<endl;
 
 	//send report to others
 	std::thread t(&MessageStore::sendLEAVE, messageStore, pid);
@@ -122,8 +122,9 @@ void Members::reportNoResponse(string pid){
 
 	//send report to self
 	Message leave=messageStore->createMessage(TYPE_LEAVE, pid, MESSAGE_ID_LEAVE,"");
-	std::thread t2(&BufferParser::parse_buffer, bufferParser, (Message*)&leave);
-	t2.detach();
+	udp->send_msg(udp->processID, leave);
+//	std::thread t2(&BufferParser::parse_buffer, bufferParser, (Message*)&leave);
+//	t2.detach();
 }
 
 string Members::getName(string pid){
@@ -153,6 +154,8 @@ void Members::parseASEQ(Message2 msg){
 void Members::parseLEAVE(Message2 msg){
 	cout << "NOTICE "+this->getName(msg.processId)+" on "+msg.processId+" left the chat group." << endl;
 
+	//		members->removeMember(processID);
+	members->memberList.erase(members->memberList.find(msg.processId));
 
 	std::vector<Message2> list;
 	for(int i=0; i< holdbackQueue->queue.size();i++ ){
